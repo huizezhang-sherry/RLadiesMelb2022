@@ -1,0 +1,544 @@
+---
+title: "Switching between space and time: Spatio-temporal analysis with cubble"
+author: "Sherry Zhang"
+format: 
+  revealjs:
+    scrollable: true
+    slide-number: true
+    show-slide-number: all
+    aspectratio: 169
+---
+
+```{r setup}
+#| include: false
+library(knitr)
+options(htmltools.dir.version = FALSE)
+opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error=FALSE, fig.align = "center")
+
+library(tidyverse)
+library(sf)
+library(ggsvg)
+library(ozmaps)
+library(cubble)
+library(patchwork)
+library(tsibble)
+```
+
+# Hi!
+
+::: columns
+::: {.column width="45%"}
+-   A 3rd year PhD student in the Department of Econometrics and Business Statistics, Monash University
+
+-   My research centers on exploring multivariate spatio-temporal data
+:::
+
+::: {.column width="45%"}
+:::
+:::
+
+# Table of Content
+
+-   Surf in the space with `sf`
+
+-   Dance with time
+
+-   
+
+## People talk about different things when they talk about spatio-temporal data
+
+```{r}
+stations_sf <- cubble::climate_subset %>% select(-ts) %>% 
+  sf::st_as_sf(coords = c("long", "lat"), crs = 4283, remove = FALSE)
+
+oz <- ozmaps::abs_ste %>% filter(NAME != "Other Territories")
+oz_simp <- oz %>% rmapshaper::ms_simplify(keep = 0.05) 
+
+svg <- readLines(here::here("figures/station-icon.svg"))
+station_svg <- paste(svg, collapse = "\n")
+#grid::grid.draw(svg_to_rasterGrob(station_svg))
+
+stations <- ggplot() +
+  geom_sf(data = oz_simp, fill = "grey95", color = "white") +
+  geom_point_svg(
+    data = stations_sf,
+    aes(long,lat),
+    css("path:nth-child(1)", fill = "#443750"),
+    css("path:nth-child(2)", fill = "#443750"),
+    css("path:nth-child(3)", fill = "#443750"),
+    css("path:nth-child(4)", fill = "#443750"),
+    css("path:nth-child(5)", fill = "#443750"),
+    svg = station_svg) + 
+  scale_svg_default() + 
+  ggthemes::theme_map() + 
+  ggtitle("Vector data")
+```
+
+```{r}
+(stations | stations)/ (stations | stations)
+```
+
+<!-- fix station, raster, traffic & ecological trajectory -->
+
+The focus of today will be on vector data
+
+# Examples of vector data
+
+Physical sensors that measure the temperature, amount of rainfall, wind speed & direction, river level, etc
+
+```{r}
+svg <- readLines(here::here("figures/sun-svgrepo-com.svg"))
+sun_svg <- paste(svg, collapse = "\n")
+svg <- readLines(here::here("figures/rain-svgrepo-com.svg"))
+rain_svg <- paste(svg, collapse = "\n")
+svg <- readLines(here::here("figures/wind-svgrepo-com.svg"))
+wind_svg <- paste(svg, collapse = "\n")
+svg <- readLines(here::here("figures/river-svgrepo-com.svg"))
+river_svg <- paste(svg, collapse = "\n")
+p1 <- svg_to_rasterGrob(sun_svg)
+p2 <- svg_to_rasterGrob(rain_svg)
+p3 <- svg_to_rasterGrob(wind_svg)
+p4 <- svg_to_rasterGrob(river_svg)
+white <- ggplot() + theme_void()
+gridExtra::grid.arrange(p1, white , p2, white, p3, white, p4, nrow = 1)
+```
+
+A recent [blog post](https://r-spatial.org//r/2022/09/12/vdc.html) on Vector Data Cubes by Edzer Pebesma
+
+## Represent vector data in R?
+
+-   A pair of longitude/ latitude
+
+```{r}
+dt <- stations_sf %>% head(2)
+```
+
+```{r}
+dt %>% st_drop_geometry() %>% select(id, long, lat, elev, name, wmo_id)
+```
+
+-   Simple features
+
+```{r}
+dt %>% select(-long, -lat)
+```
+
+-   S2 vector
+
+```{r}
+dt %>% st_drop_geometry() %>% mutate(s2 = s2::s2_lnglat(long, lat))
+```
+
+<!-- today mainly talk about sf -->
+
+## Look into an sf object - POINTS
+
+```{r echo = TRUE}
+dt # simple feature (sf)
+```
+
+```{r echo = TRUE}
+(pnt_sfc <- dt$geometry) # simple feature column (sfc)
+```
+
+    Geometry set for 1 feature 
+    Geometry type: POINT
+    Dimension:     XY
+    Bounding box:  xmin: 152.8655 ymin: -31.4336 xmax: 152.8655 ymax: -31.4336
+    Geodetic CRS:  GDA94
+    POINT (152.8655 -31.4336)
+
+```{r echo = TRUE}
+(pnt_sfg <- pnt_sfc[[1]]) # simple feature geometry (sfg) - POINTS
+```
+
+    POINT (152.8655 -31.4336)
+
+<!-- These are the three common prints you may see with an sf object -->
+
+<!-- explain what you can read here -->
+
+<!-- they may seem confusing as how can you perform operations on these objects, but they can be boiled down to the basic structure you're already familiar with  -->
+
+## Look into an sf object - POINTS (2)
+
+```{r echo = TRUE}
+typeof(dt)
+typeof(pnt_sfc)
+typeof(pnt_sfg)
+```
+
+```{r echo = TRUE}
+unlist(pnt_sfc)
+matrix(unlist(pnt_sfc), nrow = length(pnt_sfc), byrow = TRUE)
+```
+
+```{r echo = TRUE}
+length(pnt_sfg)
+unclass(pnt_sfg)
+```
+
+## Look into an sf object - POLYGONS
+
+```{r echo = TRUE, results='hide'}
+(pol_sfc <- oz_simp[8,]$geometry %>% st_cast("POLYGON"))
+```
+
+    Geometry set for 1 feature 
+    Geometry type: POLYGON
+    Dimension:     XY
+    Bounding box:  xmin: 148.7628 ymin: -35.92041 xmax: 149.3972 ymax: -35.12442
+    Geodetic CRS:  GDA94
+    POLYGON ((149.2317 -35.222, 149.2716 -35.2708, ...
+
+```{r echo = TRUE}
+(pol_sfg <- pol_sfc[[1]])
+```
+
+    POLYGON ((149.2317 -35.222, 149.2716 -35.2708, 149.3153 -35.27623, 149.3972 -35.32425, 149.3363 -35.33988, 149.2493 -35.33013, ...))
+
+```{r echo = TRUE}
+typeof(pol_sfc)
+typeof(pol_sfg)
+unclass(pol_sfg)
+```
+
+## Look into an sf object - MULTIPOLYGONS
+
+```{r echo = TRUE, results='hide'}
+(mpol_sfc <- oz_simp[2,]$geometry)
+```
+
+    Geometry set for 1 feature 
+    Geometry type: MULTIPOLYGON
+    Dimension:     XY
+    Bounding box:  xmin: 140.9617 ymin: -39.13396 xmax: 149.9763 ymax: -33.99605
+    Geodetic CRS:  GDA94
+    MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -3...
+
+```{r echo = TRUE}
+(mpol_sfg <- mpol_sfc[[1]])
+```
+
+    MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -38.75672, 146.5454 -38.79089, 146.494 -38.77426, 146.4648 -38.73993, 146.5061 -38.72507, 146.5662 -38.74262)), ((145.2475 -38.50478, 145.2217 -38.52812, 145.1439 -38.50573, 145.1668 -38.46616, 145.2145 -38.44883, 145.277 -38.45114, 145.308 -38.51863, 145.2475 -38.50478)), ...)
+
+```{r echo = TRUE}
+typeof(mpol_sfc)
+typeof(mpol_sfg)
+mopl_sfg_raw <- unclass(mpol_sfg)
+
+```
+
+## Look into an sf object - summary
+
+<!-- | type            | sf   | sfc  | sfg                      | -->
+
+<!-- |-----------------|------|------|--------------------------| -->
+
+<!-- | POINTS          | list | list | double                   | -->
+
+<!-- | MULIPOINTS      |      |      | matrix                   | -->
+
+<!-- | LINESTRING      | list | list |                          | -->
+
+<!-- | MULTILINESTRING |      |      |                          | -->
+
+<!-- | POLYGON         | list | list | list - a single matrix   | -->
+
+<!-- | MULTIPOLYGON    | list | list | list - multiple matrices | -->
+
+## The `sf`, `sfc`, and `sfg` objects have informative header prints but they can be boiled down to basic data structures that we're already familiar with. {.smaller}
+
+## Geometrical operations with `sf`
+
+<!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
+
+```{r, out.width="200%"}
+knitr::include_graphics(here::here("figures/geometrical-operations.png"))
+```
+
+# Ploting an `sf` object
+
+::: columns
+::: {.column width="43%"}
+```{r echo = TRUE}
+ggplot() + 
+  geom_sf(data = oz_simp) + 
+  geom_sf(data = stations_sf)
+```
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="53%"}
+```{r echo = TRUE}
+set.seed(123)
+dt_lbl <- stations_sf %>% arrange(id) %>% sample_n(5)
+ggplot() +
+  geom_sf(
+    data = oz_simp, 
+    fill = "grey95", color = "white") +
+  geom_sf_label(data = dt_lbl, aes(label = name)) + 
+  ggthemes::theme_map() 
+```
+:::
+:::
+
+<!-- geom_sf() will look for the "active geometry" column in the sf object and plot that  -->
+
+# Dance with time
+
+## Time series of weather station data
+
+```{r eval = FALSE}
+ts <- cubble::climate_subset %>% 
+  face_temporal() %>% 
+  filter(!is.na(tmax), !is.na(tmin)) %>% 
+  as_tibble() %>% 
+  tsibble::as_tsibble(key = id, index = date)
+save(ts, file = here::here("data/ts.rda"))
+```
+
+```{r}
+load(here::here("data/ts.rda"))
+ts
+```
+
+```{r}
+ts %>% 
+  ggplot(aes(x = date, y = tmax, group = id)) + 
+  geom_line(alpha = 0.6) + 
+  theme_bw()
+```
+
+<!-- Here it is daily data in 2020 from the stations we seen before. These weather stations measures precipitation, maximum and minimum temperature. -->
+
+<!-- Scripted from the BOM website -->
+
+<!-- In a tsibble format -->
+
+## How's the data quality from BOM ?
+
+```{r echo = TRUE}
+(missings <- ts %>% tsibble::count_gaps())
+```
+
+```{r}
+missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
+missings %>% 
+  ggplot() + 
+  geom_errorbar(
+    aes(xmin = .from, xmax = .to, 
+        y = fct_reorder(id, .n)), 
+    width = 0.2) + 
+  theme_bw() + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+  ylab("Station ID")
+```
+
+## Inexplicit NAs to explicit NAs
+
+::: columns
+::: {.column width="45%"}
+```{r echo = TRUE}
+ts2 <- ts %>% 
+  group_by_key() %>% 
+  tsibble::fill_gaps() %>% 
+  ungroup()
+```
+
+```{r echo = TRUE}
+ts %>% 
+  filter(id == "ASN00003057", 
+         date == "2020-02-17")
+ts2 %>% 
+  filter(id == "ASN00003057", 
+         date == "2020-02-17")
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="58%"}
+
+:::
+:::
+
+## Tranformations on daily data
+
+::: columns
+::: {.column width="48%"}
+```{r}
+ts %>% 
+  ggplot(aes(x = date, y = tmax, group = id)) + 
+  geom_smooth(se = FALSE)
+```
+
+```{r}
+ts %>% 
+  as_tibble() %>% 
+  group_by(month = lubridate::month(date), id) %>% 
+  summarise(tmax = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x = month, y = tmax, group = id)) + 
+  geom_line() + 
+  scale_x_continuous(breaks = seq(1, 12, 1))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="48%"}
+```{r}
+ts %>% 
+  mutate(rolling_tmax_5 = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
+  ggplot(aes(x = date, y = rolling_tmax_5, group = id)) + 
+  geom_line()
+```
+:::
+:::
+
+# Space and time at the same time
+
+# Glyph map
+
+```{r}
+left_join(stations_sf, ts) %>% 
+  st_drop_geometry() %>% 
+  group_by(month = lubridate::month(date), id, long, lat) %>% 
+  summarise(tmax = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x_minor = month, y_minor = tmax, 
+             x_major = long, y_major = lat)) + 
+  geom_sf(data = oz_simp, fill = "grey95", color = "white", inherit.aes = FALSE) +
+  #geom_glyph_box(width = 2, height = 0.7) + 
+  geom_glyph(width = 2, height = 0.7) + 
+  ggthemes::theme_map() 
+```
+
+## Transform a dot into a glyph
+
+```{r}
+knitr::include_graphics(here::here("figures/glyph-steps1.png"))
+```
+
+## Transform a dot into a glyph
+
+```{r}
+knitr::include_graphics(here::here("figures/glyph-steps2.png"))
+```
+
+## Glyph map in R 
+
+:::{.columns}
+:::{.column width="48%"}
+```{r eval = FALSE, echo = TRUE}
+# use `GGally::glyphs()`
+GLYPH_DATA <- glyphs(
+  DATA, X_MAJOR, X_MINOR, 
+  Y_MAJOR, Y_MINOR)
+
+# GLYPH_DATA is a data frame with
+# columns gx, gy, and gid appended
+
+ggplot(GLYPH_DATA) +
+  geom_path(
+    aes(gx, gy, group = gid)
+    ) + 
+  ...
+```
+
+:::
+
+:::{.column width="4%"}
+:::
+
+:::{.column width="48%"}
+```{r eval = FALSE, echo = TRUE}
+# use `cubble::geom_glyph()`
+DATA %>% 
+  ggplot() +
+  geom_glyph(
+    aes(x_major = X_MAJOR, 
+        x_minor = X_MINOR,
+        y_major = Y_MAJOR, 
+        y_minor = Y_MINOR)) + 
+  ...
+```
+
+:::
+
+:::
+
+## Making your first glyph map
+
+::: .columns
+::: {.column width="45%"}
+```{r echo = TRUE, eval = FALSE}
+ts_month <- ts %>% 
+  as_tibble() %>% 
+  group_by(month = lubridate::month(date), id) %>% 
+  summarise(tmax = mean(tmax, na.rm = TRUE)) 
+
+joined <- left_join(ts_month, stations_sf)
+
+ggplot() + 
+  geom_sf(
+    data = oz_simp, 
+    fill = "grey95", 
+    color = "white") +
+  geom_glyph(
+    data = joined,
+    aes(x_major = long, x_minor = month, 
+        y_major = lat, y_minor = tmax),
+    width = 2, height = 0.7) + 
+  ggthemes::theme_map()
+```
+:::
+
+
+::: {.column width="53%"}
+```{r}
+ts_month <- ts %>% 
+  as_tibble() %>% 
+  group_by(month = lubridate::month(date), id) %>% 
+  summarise(tmax = mean(tmax, na.rm = TRUE)) 
+
+joined <- left_join(ts_month, stations_sf)
+
+ggplot() + 
+  geom_sf(
+    data = oz_simp, 
+    fill = "grey95",
+    color = "white") +
+  geom_glyph(
+    data = joined,
+    aes(x_major = long, x_minor = month, 
+        y_major = lat, y_minor = tmax),
+    width = 2, height = 0.7) + 
+  ggthemes::theme_map()
+```
+:::
+
+:::
+
+## Your Time 
+
+1. Select a subset of the stations that interest you (i.e. within one state, has some commonality)
+
+2. Pick a temporal variable of your interest and apply a smoothing technique to the daily data
+
+3. Combine the station data with the temporal data to make a glyph map
+
+## Cubble - a new spatio-temporal vector data structure 
+
+one page introduction
+
+## Summary 
+
+## Further reading
+
+## Acknowledgements
+
+The slides are made with `Quarto`
