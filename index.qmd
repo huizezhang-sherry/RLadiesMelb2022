@@ -27,25 +27,32 @@ library(tsibble)
 # Hi!
 
 ::: columns
-::: {.column width="45%"}
+::: {.column width="65%"}
 -   A 3rd year PhD student in the Department of Econometrics and Business Statistics, Monash University
 
--   My research centers on exploring multivariate spatio-temporal data
+-   My research centers on exploring multivariate spatio-temporal with data wrangling and visualisation tool. 
 :::
 
-::: {.column width="45%"}
+::: {.column width="35%"}
+```{r}
+knitr::include_graphics(here::here("figures/headshot.jpg"))
+```
+
+
 :::
 :::
 
 # Table of Content
 
--   Surf in the space with `sf`
+-   [TODO] Surf in the space with `sf`
 
--   Dance with time
+-   [TODO] Dance with time
 
--   
+-   Making a glyph map to explore time and space together
 
-## People talk about different things when they talk about spatio-temporal data
+# Spatio-temporal data
+
+People talk about different things when they talk about spatio-temporal data! 
 
 ```{r}
 stations_sf <- cubble::climate_subset %>% select(-ts) %>% 
@@ -60,31 +67,43 @@ station_svg <- paste(svg, collapse = "\n")
 
 stations <- ggplot() +
   geom_sf(data = oz_simp, fill = "grey95", color = "white") +
-  geom_point_svg(
-    data = stations_sf,
-    aes(long,lat),
-    css("path:nth-child(1)", fill = "#443750"),
-    css("path:nth-child(2)", fill = "#443750"),
-    css("path:nth-child(3)", fill = "#443750"),
-    css("path:nth-child(4)", fill = "#443750"),
-    css("path:nth-child(5)", fill = "#443750"),
-    svg = station_svg) + 
-  scale_svg_default() + 
+  geom_point(data = stations_sf, aes(long,lat)) + 
   ggthemes::theme_map() + 
-  ggtitle("Vector data")
+  ggtitle("Vector")
+
+raster <- GGally::nasa %>% 
+  filter(year == 1995) %>% 
+  ggplot(aes(x = long, y = lat, fill = temperature)) + 
+  geom_raster() + 
+  theme_minimal() +  
+  theme(aspect.ratio = 1, legend.position = "none") + 
+  ggtitle("Raster")
+
+trajectory <- dplyr::storms %>% 
+  filter(status == "hurricane") %>% 
+  ggplot(aes(x = long, y = lat, group = interaction(name, year))) + 
+  geom_path(size = 0.5) + 
+  ggtitle("Trajectory")
 ```
 
 ```{r}
-(stations | stations)/ (stations | stations)
+stations | raster | trajectory
 ```
 
-<!-- fix station, raster, traffic & ecological trajectory -->
 
 The focus of today will be on vector data
 
+::: {.notes}
+There are many different data that can sit under the big umbrella of spatio-temporal data.
+
+Here we have three different types: vector, raster, trajectory data (explain each)
+
+In ecology, there is also observation data where species are observed at different locations each time. 
+
+:::
 # Examples of vector data
 
-Physical sensors that measure the temperature, amount of rainfall, wind speed & direction, river level, etc
+Physical sensors that measure the temperature, rainfall, wind speed & direction, river level, etc
 
 ```{r}
 svg <- readLines(here::here("figures/sun-svgrepo-com.svg"))
@@ -123,11 +142,11 @@ dt %>% st_drop_geometry() %>% select(id, long, lat, elev, name, wmo_id)
 dt %>% select(-long, -lat)
 ```
 
--   S2 vector
+<!-- -   S2 vector -->
 
-```{r}
-dt %>% st_drop_geometry() %>% mutate(s2 = s2::s2_lnglat(long, lat))
-```
+<!-- ```{r} -->
+<!-- dt %>% st_drop_geometry() %>% mutate(s2 = s2::s2_lnglat(long, lat)) -->
+<!-- ``` -->
 
 <!-- today mainly talk about sf -->
 
@@ -137,7 +156,7 @@ dt %>% st_drop_geometry() %>% mutate(s2 = s2::s2_lnglat(long, lat))
 dt # simple feature (sf)
 ```
 
-```{r echo = TRUE}
+```{r echo = TRUE, results='hide'}
 (pnt_sfc <- dt$geometry) # simple feature column (sfc)
 ```
 
@@ -147,6 +166,7 @@ dt # simple feature (sf)
     Bounding box:  xmin: 152.8655 ymin: -31.4336 xmax: 152.8655 ymax: -31.4336
     Geodetic CRS:  GDA94
     POINT (152.8655 -31.4336)
+    POINT (150.9291 -34.3691)
 
 ```{r echo = TRUE}
 (pnt_sfg <- pnt_sfc[[1]]) # simple feature geometry (sfg) - POINTS
@@ -154,42 +174,70 @@ dt # simple feature (sf)
 
     POINT (152.8655 -31.4336)
 
-<!-- These are the three common prints you may see with an sf object -->
+::: {.notes}
+When working with an sf object, these are the three common prints you may see 
 
-<!-- explain what you can read here -->
+The first one is the print of an sf object, lets call it `dt`, ...
 
-<!-- they may seem confusing as how can you perform operations on these objects, but they can be boiled down to the basic structure you're already familiar with  -->
+explain what you can read here
+
+they may seem confusing as how can you perform operations on these objects, but they can be boiled down to the basic structure you're already familiar with
+:::
 
 ## Look into an sf object - POINTS (2)
 
-```{r echo = TRUE}
-typeof(dt)
-typeof(pnt_sfc)
-typeof(pnt_sfg)
-```
-
-```{r echo = TRUE}
-unlist(pnt_sfc)
-matrix(unlist(pnt_sfc), nrow = length(pnt_sfc), byrow = TRUE)
-```
-
-```{r echo = TRUE}
-length(pnt_sfg)
-unclass(pnt_sfg)
-```
-
-## Look into an sf object - POLYGONS
+The POINT sfc is a list of sfg with specialised attributes 
 
 ```{r echo = TRUE, results='hide'}
-(pol_sfc <- oz_simp[8,]$geometry %>% st_cast("POLYGON"))
+pnt_sfc # simple feature column (sfc)
+```
+   
+    Geometry set for 1 feature 
+    Geometry type: POINT
+    Dimension:     XY
+    Bounding box:  xmin: 152.8655 ymin: -31.4336 xmax: 152.8655 ymax: -31.4336
+    Geodetic CRS:  GDA94
+    POINT (152.8655 -31.4336)
+    POINT (150.9291 -34.3691)
+
+```{r echo = TRUE}
+typeof(pnt_sfc)
+names(attributes(pnt_sfc))
 ```
 
-    Geometry set for 1 feature 
-    Geometry type: POLYGON
-    Dimension:     XY
-    Bounding box:  xmin: 148.7628 ymin: -35.92041 xmax: 149.3972 ymax: -35.12442
-    Geodetic CRS:  GDA94
-    POLYGON ((149.2317 -35.222, 149.2716 -35.2708, ...
+```{r echo = TRUE, results='hide'}
+unclass(pnt_sfc)[1:2]
+```
+
+    [[1]]
+    POINT (152.8655 -31.4336)
+    
+    [[2]]
+    POINT (150.9291 -34.3691)
+
+## Look into an sf object - POINTS (3)
+
+The point sfg is a paired vector with specalised class labels
+
+```{r echo = TRUE}
+pnt_sfg # simple feature geometry (sfg) - POINTS
+```
+
+    POINT (152.8655 -31.4336)
+
+```{r echo = TRUE}
+typeof(pnt_sfg) 
+unclass(pnt_sfg)
+attributes(pnt_sfg)
+```
+
+## Other geom types - POLYGONS
+
+POLYGON sfg is a matrix of paired vectors
+
+```{r results='hide'}
+pol_sfc <- oz_simp[8,]$geometry %>% st_cast("POLYGON")
+```
 
 ```{r echo = TRUE}
 (pol_sfg <- pol_sfc[[1]])
@@ -198,23 +246,17 @@ unclass(pnt_sfg)
     POLYGON ((149.2317 -35.222, 149.2716 -35.2708, 149.3153 -35.27623, 149.3972 -35.32425, 149.3363 -35.33988, 149.2493 -35.33013, ...))
 
 ```{r echo = TRUE}
-typeof(pol_sfc)
 typeof(pol_sfg)
 unclass(pol_sfg)
 ```
 
-## Look into an sf object - MULTIPOLYGONS
+## Other geom types - MULTIPOLYGONS
 
-```{r echo = TRUE, results='hide'}
-(mpol_sfc <- oz_simp[2,]$geometry)
+MULTIPOLYGON sfg is multiple matrices of paired vectors
+
+```{r }
+mpol_sfc <- rmapshaper::ms_simplify(oz_simp[2,]$geometry, keep = 0.4)
 ```
-
-    Geometry set for 1 feature 
-    Geometry type: MULTIPOLYGON
-    Dimension:     XY
-    Bounding box:  xmin: 140.9617 ymin: -39.13396 xmax: 149.9763 ymax: -33.99605
-    Geodetic CRS:  GDA94
-    MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -3...
 
 ```{r echo = TRUE}
 (mpol_sfg <- mpol_sfc[[1]])
@@ -223,10 +265,9 @@ unclass(pol_sfg)
     MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -38.75672, 146.5454 -38.79089, 146.494 -38.77426, 146.4648 -38.73993, 146.5061 -38.72507, 146.5662 -38.74262)), ((145.2475 -38.50478, 145.2217 -38.52812, 145.1439 -38.50573, 145.1668 -38.46616, 145.2145 -38.44883, 145.277 -38.45114, 145.308 -38.51863, 145.2475 -38.50478)), ...)
 
 ```{r echo = TRUE}
-typeof(mpol_sfc)
 typeof(mpol_sfg)
-mopl_sfg_raw <- unclass(mpol_sfg)
-
+length(unclass(mpol_sfg))
+unclass(mpol_sfg)
 ```
 
 ## Look into an sf object - summary
@@ -257,7 +298,7 @@ mopl_sfg_raw <- unclass(mpol_sfg)
 knitr::include_graphics(here::here("figures/geometrical-operations.png"))
 ```
 
-# Ploting an `sf` object
+## Ploting an `sf` object
 
 ::: columns
 ::: {.column width="43%"}
@@ -279,7 +320,9 @@ ggplot() +
   geom_sf(
     data = oz_simp, 
     fill = "grey95", color = "white") +
-  geom_sf_label(data = dt_lbl, aes(label = name)) + 
+  geom_sf_label(
+    data = dt_lbl, 
+    aes(label = name)) + 
   ggthemes::theme_map() 
 ```
 :::
@@ -402,7 +445,7 @@ ts %>%
 
 # Space and time at the same time
 
-# Glyph map
+# Goal of today: glyph map
 
 ```{r}
 left_join(stations_sf, ts) %>% 
@@ -417,16 +460,44 @@ left_join(stations_sf, ts) %>%
   ggthemes::theme_map() 
 ```
 
-## Transform a dot into a glyph
+## Cubble - a spatio-temporal vector data structure 
 
 ```{r}
-knitr::include_graphics(here::here("figures/glyph-steps1.png"))
+knitr::include_graphics(here::here("figures/cubble-operations.png"))
 ```
 
-## Transform a dot into a glyph
+## Cast your data into a cubble
+
+```{r echo = TRUE}
+(cb <- as_cubble(
+  list(spatial = stations_sf, temporal = ts),
+  key = id, index = ts, coords = c(long, lat)
+))
+```
+
+## Subsets on space
+
+```{r echo = TRUE}
+vic_map <- ozmaps::abs_ste %>% filter(NAME == "Victoria")
+#cb_space <- cb %>% filter(st_within(cb$geometry, vic_map, sparse = FALSE)[,1])
+```
+
+## Summarise in time
+
+```{r echo = TRUE}
+#cb %>% face_temporal()
+```
+
+## Move coordinates into time
+
+```{r echo = TRUE}
+#cb %>% unfold(long, lat)
+```
+
+## Glyph map transformation
 
 ```{r}
-knitr::include_graphics(here::here("figures/glyph-steps2.png"))
+knitr::include_graphics(here::here("figures/glyph-steps.png"))
 ```
 
 ## Glyph map in R 
@@ -440,7 +511,7 @@ GLYPH_DATA <- glyphs(
   Y_MAJOR, Y_MINOR)
 
 # GLYPH_DATA is a data frame with
-# columns gx, gy, and gid appended
+# columns gx, gy, and gid
 
 ggplot(GLYPH_DATA) +
   geom_path(
@@ -476,12 +547,13 @@ DATA %>%
 ::: .columns
 ::: {.column width="45%"}
 ```{r echo = TRUE, eval = FALSE}
-ts_month <- ts %>% 
-  as_tibble() %>% 
-  group_by(month = lubridate::month(date), id) %>% 
-  summarise(tmax = mean(tmax, na.rm = TRUE)) 
+cb <- as_cubble(
+  list(spatial = stations_sf, temporal = ts),
+  key = id, index = ts, coords = c(long, lat)
+)
 
-joined <- left_join(ts_month, stations_sf)
+cb_glyph <- cb %>% 
+  ...
 
 ggplot() + 
   geom_sf(
@@ -489,7 +561,7 @@ ggplot() +
     fill = "grey95", 
     color = "white") +
   geom_glyph(
-    data = joined,
+    data = cb_glyph,
     aes(x_major = long, x_minor = month, 
         y_major = lat, y_minor = tmax),
     width = 2, height = 0.7) + 
@@ -500,24 +572,25 @@ ggplot() +
 
 ::: {.column width="53%"}
 ```{r}
-ts_month <- ts %>% 
-  as_tibble() %>% 
-  group_by(month = lubridate::month(date), id) %>% 
-  summarise(tmax = mean(tmax, na.rm = TRUE)) 
-
-joined <- left_join(ts_month, stations_sf)
-
-ggplot() + 
-  geom_sf(
-    data = oz_simp, 
-    fill = "grey95",
-    color = "white") +
-  geom_glyph(
-    data = joined,
-    aes(x_major = long, x_minor = month, 
-        y_major = lat, y_minor = tmax),
-    width = 2, height = 0.7) + 
-  ggthemes::theme_map()
+# cb <- as_cubble(
+#   list(spatial = stations_sf, temporal = ts),
+#   key = id, index = ts, coords = c(long, lat)
+# )
+# 
+# cb_glyph <- cb %>% 
+#   ...
+# 
+# ggplot() + 
+#   geom_sf(
+#     data = oz_simp, 
+#     fill = "grey95",
+#     color = "white") +
+#   geom_glyph(
+#     data = cb_glyph,
+#     aes(x_major = long, x_minor = month, 
+#         y_major = lat, y_minor = tmax),
+#     width = 2, height = 0.7) + 
+#   ggthemes::theme_map()
 ```
 :::
 
@@ -525,20 +598,19 @@ ggplot() +
 
 ## Your Time 
 
-1. Select a subset of the stations that interest you (i.e. within one state, has some commonality)
+1. Create a cubble object from the spatial and temporal data given
 
-2. Pick a temporal variable of your interest and apply a smoothing technique to the daily data
+2. Filter on a subset of the stations that interest you (i.e. within one state, has some commonality)
 
-3. Combine the station data with the temporal data to make a glyph map
+3. Pick a smoothing technique to summarise the temporal data 
 
-## Cubble - a new spatio-temporal vector data structure 
-
-one page introduction
+4. Make a glyph map!
 
 ## Summary 
 
 ## Further reading
 
+  - Spatial Data Science with application to R: https://r-spatial.org/book/
+
 ## Acknowledgements
 
-The slides are made with `Quarto`
