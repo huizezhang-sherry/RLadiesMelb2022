@@ -44,9 +44,9 @@ knitr::include_graphics(here::here("figures/headshot.jpg"))
 
 # Table of Content
 
--   [TODO] Surf in the space with `sf`
+-   Dive into the data structure in `sf`
 
--   [TODO] Dance with time
+-   Aggregate time series with `tsibble`
 
 -   Making a glyph map to explore time and space together
 
@@ -160,10 +160,10 @@ dt # simple feature (sf)
 (pnt_sfc <- dt$geometry) # simple feature column (sfc)
 ```
 
-    Geometry set for 1 feature 
+    Geometry set for 2 features 
     Geometry type: POINT
     Dimension:     XY
-    Bounding box:  xmin: 152.8655 ymin: -31.4336 xmax: 152.8655 ymax: -31.4336
+    Bounding box:  xmin: 150.9291 ymin: -34.3691 xmax: 152.8655 ymax: -31.4336
     Geodetic CRS:  GDA94
     POINT (152.8655 -31.4336)
     POINT (150.9291 -34.3691)
@@ -217,7 +217,7 @@ unclass(pnt_sfc)[1:2]
 
 ## Look into an sf object - POINTS (3)
 
-The point sfg is a paired vector with specalised class labels
+The point sfg is a paired vector with specialised class labels
 
 ```{r echo = TRUE}
 pnt_sfg # simple feature geometry (sfg) - POINTS
@@ -231,9 +231,30 @@ unclass(pnt_sfg)
 attributes(pnt_sfg)
 ```
 
+The `POINT (152.8655 -31.4336)` format is called well-known text, which is a human-readable encoding used by sf
+
+## Other geom types - LINESTRING
+
+The linestring sfg is a matrix of paired doubles
+
+```{r results = "hide"}
+ls_sfc <- oz_simp[8,]$geometry %>% st_cast("POLYGON") %>% st_cast("LINESTRING")
+```
+
+```{r echo = TRUE}
+(ls_sfg <- ls_sfc[[1]])
+```
+
+    LINESTRING (149.2317 -35.222, 149.2716 -35.2708, 149.3153 -35.27623, 149.3972 -35.32425, 149.3363 -35.33988, 149.2493 -35.33013, 149.2045 -35.34761, 149.1464 -35.4153, 149.1352, ...)
+    
+```{r echo = TRUE}
+typeof(ls_sfg)
+unclass(ls_sfg)
+```
+
 ## Other geom types - POLYGONS
 
-POLYGON sfg is a matrix of paired vectors
+POLYGON sfg is a list, where each element is a  matrix of paired vectors
 
 ```{r results='hide'}
 pol_sfc <- oz_simp[8,]$geometry %>% st_cast("POLYGON")
@@ -252,7 +273,7 @@ unclass(pol_sfg)
 
 ## Other geom types - MULTIPOLYGONS
 
-MULTIPOLYGON sfg is multiple matrices of paired vectors
+MULTIPOLYGON sfg is a nested list where each list element can contain multiple matrices of paired vectors
 
 ```{r }
 mpol_sfc <- rmapshaper::ms_simplify(oz_simp[2,]$geometry, keep = 0.4)
@@ -270,25 +291,15 @@ length(unclass(mpol_sfg))
 unclass(mpol_sfg)
 ```
 
-## Look into an sf object - summary
+## Geometry types - summary
 
-<!-- | type            | sf   | sfc  | sfg                      | -->
+-  The `sf`, `sfc`, and `sfg` objects have informative header prints but they can be boiled down to basic data structures that we're already familiar with
 
-<!-- |-----------------|------|------|--------------------------| -->
+- There are more than just introduced geometry types: MULTIPOINTS, MULTILINESTRING, etc
 
-<!-- | POINTS          | list | list | double                   | -->
+- In practice, you don't necessary have to decompose/ manipulate these geometry types manually 
 
-<!-- | MULIPOINTS      |      |      | matrix                   | -->
-
-<!-- | LINESTRING      | list | list |                          | -->
-
-<!-- | MULTILINESTRING |      |      |                          | -->
-
-<!-- | POLYGON         | list | list | list - a single matrix   | -->
-
-<!-- | MULTIPOLYGON    | list | list | list - multiple matrices | -->
-
-## The `sf`, `sfc`, and `sfg` objects have informative header prints but they can be boiled down to basic data structures that we're already familiar with. {.smaller}
+<!-- an animation "|>" to next slide? -->
 
 ## Geometrical operations with `sf`
 
@@ -330,7 +341,7 @@ ggplot() +
 
 <!-- geom_sf() will look for the "active geometry" column in the sf object and plot that  -->
 
-# Dance with time
+# Aggregate time series with `tsibble`
 
 ## Time series of weather station data
 
@@ -345,10 +356,11 @@ save(ts, file = here::here("data/ts.rda"))
 
 ```{r}
 load(here::here("data/ts.rda"))
-ts
 ```
 
 ```{r}
+#| output-location: column-fragment
+#| echo: true
 ts %>% 
   ggplot(aes(x = date, y = tmax, group = id)) + 
   geom_line(alpha = 0.6) + 
@@ -361,13 +373,16 @@ ts %>%
 
 <!-- In a tsibble format -->
 
-## How's the data quality from BOM ?
+## How's the data quality from BOM?
 
 ```{r echo = TRUE}
 (missings <- ts %>% tsibble::count_gaps())
 ```
 
+## How's the data quality from BOM (2)?
+
 ```{r}
+#| output-location: column-fragment
 missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
 missings %>% 
   ggplot() + 
@@ -414,12 +429,16 @@ ts2 %>%
 ::: columns
 ::: {.column width="48%"}
 ```{r}
+#| code-fold: true
+#| echo: true
 ts %>% 
   ggplot(aes(x = date, y = tmax, group = id)) + 
   geom_smooth(se = FALSE)
 ```
 
 ```{r}
+#| code-fold: true
+#| echo: true
 ts %>% 
   as_tibble() %>% 
   group_by(month = lubridate::month(date), id) %>% 
@@ -435,17 +454,27 @@ ts %>%
 
 ::: {.column width="48%"}
 ```{r}
+#| code-fold: true
+#| echo: true
 ts %>% 
   mutate(rolling_tmax_5 = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
   ggplot(aes(x = date, y = rolling_tmax_5, group = id)) + 
   geom_line()
 ```
+
+```{r}
+# ts %>% 
+#   mutate() %>% 
+#   ggplot(aes(x = date, y = rolling_tmax_5, group = id)) + 
+#   geom_line()
+```
+
 :::
 :::
 
 # Space and time at the same time
 
-# Goal of today: glyph map
+## Goal of today: glyph map
 
 ```{r}
 left_join(stations_sf, ts) %>% 
@@ -471,27 +500,36 @@ knitr::include_graphics(here::here("figures/cubble-operations.png"))
 ```{r echo = TRUE}
 (cb <- as_cubble(
   list(spatial = stations_sf, temporal = ts),
-  key = id, index = ts, coords = c(long, lat)
+  key = id, index = date, coords = c(long, lat)
 ))
 ```
 
 ## Subsets on space
 
 ```{r echo = TRUE}
-vic_map <- ozmaps::abs_ste %>% filter(NAME == "Victoria")
-#cb_space <- cb %>% filter(st_within(cb$geometry, vic_map, sparse = FALSE)[,1])
+vic_map <- ozmaps::abs_ste %>% 
+  filter(NAME == "Victoria")
+# cb_space <- cb %>% 
+#   bind_cols(within = st_within(
+#     cb$geometry, 
+#     vic_map, 
+#     sparse = FALSE
+#     )[,1]) %>% 
+#   filter(within)
 ```
 
 ## Summarise in time
 
 ```{r echo = TRUE}
-#cb %>% face_temporal()
+(cb_tm <- cb %>% 
+  face_temporal() %>% 
+  mutate(rolling_tmax_5 = slider::slide_dbl(tmax, mean, .after = 60, na.rm = TRUE)) )
 ```
 
 ## Move coordinates into time
 
 ```{r echo = TRUE}
-#cb %>% unfold(long, lat)
+(cb_glyph <- cb_tm %>% unfold(long, lat))
 ```
 
 ## Glyph map transformation
@@ -507,7 +545,8 @@ knitr::include_graphics(here::here("figures/glyph-steps.png"))
 ```{r eval = FALSE, echo = TRUE}
 # use `GGally::glyphs()`
 GLYPH_DATA <- glyphs(
-  DATA, X_MAJOR, X_MINOR, 
+  DATA, 
+  X_MAJOR, X_MINOR, 
   Y_MAJOR, Y_MINOR)
 
 # GLYPH_DATA is a data frame with
@@ -549,11 +588,13 @@ DATA %>%
 ```{r echo = TRUE, eval = FALSE}
 cb <- as_cubble(
   list(spatial = stations_sf, temporal = ts),
-  key = id, index = ts, coords = c(long, lat)
+  key = id, index = date, coords = c(long, lat)
 )
 
 cb_glyph <- cb %>% 
-  ...
+  face_temporal() %>% 
+  mutate(rolling_tmax = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
+  unfold(long, lat)
 
 ggplot() + 
   geom_sf(
@@ -562,8 +603,8 @@ ggplot() +
     color = "white") +
   geom_glyph(
     data = cb_glyph,
-    aes(x_major = long, x_minor = month, 
-        y_major = lat, y_minor = tmax),
+    aes(x_major = long, x_minor = as.numeric(date), 
+        y_major = lat, y_minor = rolling_tmax),
     width = 2, height = 0.7) + 
   ggthemes::theme_map()
 ```
@@ -572,25 +613,27 @@ ggplot() +
 
 ::: {.column width="53%"}
 ```{r}
-# cb <- as_cubble(
-#   list(spatial = stations_sf, temporal = ts),
-#   key = id, index = ts, coords = c(long, lat)
-# )
-# 
-# cb_glyph <- cb %>% 
-#   ...
-# 
-# ggplot() + 
-#   geom_sf(
-#     data = oz_simp, 
-#     fill = "grey95",
-#     color = "white") +
-#   geom_glyph(
-#     data = cb_glyph,
-#     aes(x_major = long, x_minor = month, 
-#         y_major = lat, y_minor = tmax),
-#     width = 2, height = 0.7) + 
-#   ggthemes::theme_map()
+cb <- as_cubble(
+  list(spatial = stations_sf, temporal = ts),
+  key = id, index = date, coords = c(long, lat)
+)
+
+cb_glyph <- cb %>%
+  face_temporal() %>% 
+  mutate(rolling_tmax = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
+  unfold(long, lat)
+
+ggplot() +
+  geom_sf(
+    data = oz_simp,
+    fill = "grey95",
+    color = "white") +
+  geom_glyph(
+    data = cb_glyph,
+    aes(x_major = long, x_minor = as.numeric(date),
+        y_major = lat, y_minor = rolling_tmax),
+    width = 2, height = 0.7) +
+  ggthemes::theme_map()
 ```
 :::
 
@@ -606,11 +649,12 @@ ggplot() +
 
 4. Make a glyph map!
 
-## Summary 
-
 ## Further reading
 
   - Spatial Data Science with application to R: https://r-spatial.org/book/
+  - `sf`: https://r-spatial.github.io/sf/index.html
+  - `tsibble`: https://tsibble.tidyverts.org/
+  - `cubble`: https://huizezhang-sherry.github.io/cubble/
 
 ## Acknowledgements
 
