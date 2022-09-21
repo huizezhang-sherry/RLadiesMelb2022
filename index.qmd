@@ -1,6 +1,7 @@
 ---
 title: "Switching between space and time: Spatio-temporal analysis with cubble"
 author: "Sherry Zhang"
+date: "2022-09-27"
 format: 
   revealjs:
     scrollable: true
@@ -10,7 +11,7 @@ format:
 ---
 
 ```{r setup}
-#| include: false
+#| include: false  
 library(knitr)
 options(htmltools.dir.version = FALSE)
 opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error=FALSE, fig.align = "center")
@@ -42,13 +43,18 @@ knitr::include_graphics(here::here("figures/headshot.jpg"))
 :::
 :::
 
-# Table of Content
+# Roadmap
 
--   Dive into the data structure in `sf`
+```{r}
+knitr::include_graphics(here::here("figures/roadmap.png"))
+```
 
--   Aggregate time series with `tsibble`
 
--   Making a glyph map to explore time and space together
+<!-- -   Dive into the data structure in `sf` -->
+
+<!-- -   Aggregate time series with `tsibble` -->
+
+<!-- -   Making a glyph map to explore time and space together -->
 
 # Spatio-temporal data
 
@@ -150,7 +156,46 @@ dt %>% select(-long, -lat)
 
 <!-- today mainly talk about sf -->
 
-## Look into an sf object - POINTS
+## Geometrical operations with `sf`
+
+<!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
+
+```{r, out.width="200%"}
+knitr::include_graphics(here::here("figures/geometrical-operations.png"))
+```
+
+## Ploting an `sf` object 
+::: columns
+::: {.column width="43%"}
+```{r echo = TRUE}
+ggplot() + 
+  geom_sf(data = oz_simp) + 
+  geom_sf(data = stations_sf)
+```
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="53%"}
+```{r echo = TRUE}
+set.seed(1234)
+dt_lbl <- stations_sf %>% arrange(id) %>% sample_n(5)
+ggplot() +
+  geom_sf(
+    data = oz_simp, 
+    fill = "grey95", color = "white") +
+  geom_sf_label(
+    data = dt_lbl, 
+    aes(label = name)) + 
+  ggthemes::theme_map() 
+```
+:::
+:::
+
+<!-- geom_sf() will look for the "active geometry" column in the sf object and plot that  -->
+
+## Look into an sf object - POINTS 
 
 ```{r echo = TRUE}
 dt # simple feature (sf)
@@ -297,49 +342,10 @@ unclass(mpol_sfg)
 
 - There are more than just introduced geometry types: MULTIPOINTS, MULTILINESTRING, etc
 
-- In practice, you don't necessary have to decompose/ manipulate these geometry types manually 
+- In practice, you don't have to decompose/ manipulate these vectors or matrices manually, existing geometrical operations (`st_xxx()`) and visualisation tools (`geom_sf()`) will do that for you.
 
 <!-- an animation "|>" to next slide? -->
 
-## Geometrical operations with `sf`
-
-<!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
-
-```{r, out.width="200%"}
-knitr::include_graphics(here::here("figures/geometrical-operations.png"))
-```
-
-## Ploting an `sf` object
-
-::: columns
-::: {.column width="43%"}
-```{r echo = TRUE}
-ggplot() + 
-  geom_sf(data = oz_simp) + 
-  geom_sf(data = stations_sf)
-```
-:::
-
-::: {.column width="4%"}
-:::
-
-::: {.column width="53%"}
-```{r echo = TRUE}
-set.seed(123)
-dt_lbl <- stations_sf %>% arrange(id) %>% sample_n(5)
-ggplot() +
-  geom_sf(
-    data = oz_simp, 
-    fill = "grey95", color = "white") +
-  geom_sf_label(
-    data = dt_lbl, 
-    aes(label = name)) + 
-  ggthemes::theme_map() 
-```
-:::
-:::
-
-<!-- geom_sf() will look for the "active geometry" column in the sf object and plot that  -->
 
 # Aggregate time series with `tsibble`
 
@@ -349,8 +355,7 @@ ggplot() +
 ts <- cubble::climate_subset %>% 
   face_temporal() %>% 
   filter(!is.na(tmax), !is.na(tmin)) %>% 
-  as_tibble() %>% 
-  tsibble::as_tsibble(key = id, index = date)
+  as_tibble()
 save(ts, file = here::here("data/ts.rda"))
 ```
 
@@ -373,25 +378,37 @@ ts %>%
 
 <!-- In a tsibble format -->
 
-## How's the data quality from BOM?
+## How's the data quality from BOM? 
 
 ```{r echo = TRUE}
-(missings <- ts %>% tsibble::count_gaps())
+options(pillar.print_max = 5, pillar.print_min = 5)
+ts_tsibble <- ts %>% tsibble::as_tsibble(key = id, index = date)
+(missings <- ts_tsibble %>% tsibble::count_gaps())
 ```
+
+```{r echo = TRUE, eval = FALSE}
+missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
+missings %>% 
+  ggplot() + 
+  geom_errorbar(aes(xmin = .from, xmax = .to, y = fct_reorder(id, .n)), width = 0.2) + 
+  theme_bw() + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+  ylab("Station ID")
+```
+
 
 ## How's the data quality from BOM (2)?
 
 ```{r}
-#| output-location: column-fragment
 missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
-missings %>% 
-  ggplot() + 
+missings %>%
+  ggplot() +
   geom_errorbar(
-    aes(xmin = .from, xmax = .to, 
-        y = fct_reorder(id, .n)), 
-    width = 0.2) + 
-  theme_bw() + 
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
+    aes(xmin = .from, xmax = .to,
+        y = fct_reorder(id, .n)),
+    width = 0.2) +
+  theme_bw() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   ylab("Station ID")
 ```
 
@@ -400,7 +417,7 @@ missings %>%
 ::: columns
 ::: {.column width="45%"}
 ```{r echo = TRUE}
-ts2 <- ts %>% 
+ts2 <- ts_tsibble %>% 
   group_by_key() %>% 
   tsibble::fill_gaps() %>% 
   ungroup()
@@ -424,55 +441,20 @@ ts2 %>%
 :::
 :::
 
-## Tranformations on daily data
-
-::: columns
-::: {.column width="48%"}
-```{r}
-#| code-fold: true
-#| echo: true
-ts %>% 
-  ggplot(aes(x = date, y = tmax, group = id)) + 
-  geom_smooth(se = FALSE)
-```
+## Summarising daily data
 
 ```{r}
-#| code-fold: true
+#| code-fold: show
 #| echo: true
 ts %>% 
-  as_tibble() %>% 
   group_by(month = lubridate::month(date), id) %>% 
   summarise(tmax = mean(tmax, na.rm = TRUE)) %>% 
   ggplot(aes(x = month, y = tmax, group = id)) + 
   geom_line() + 
   scale_x_continuous(breaks = seq(1, 12, 1))
 ```
-:::
 
-::: {.column width="2%"}
-:::
-
-::: {.column width="48%"}
-```{r}
-#| code-fold: true
-#| echo: true
-ts %>% 
-  mutate(rolling_tmax_5 = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
-  ggplot(aes(x = date, y = rolling_tmax_5, group = id)) + 
-  geom_line()
-```
-
-```{r}
-# ts %>% 
-#   mutate() %>% 
-#   ggplot(aes(x = date, y = rolling_tmax_5, group = id)) + 
-#   geom_line()
-```
-
-:::
-:::
-
-# Space and time at the same time
+# Space and time at the same time 
 
 ## Goal of today: glyph map
 
@@ -495,7 +477,7 @@ left_join(stations_sf, ts) %>%
 knitr::include_graphics(here::here("figures/cubble-operations.png"))
 ```
 
-## Cast your data into a cubble
+## Cast your data into a cubble 
 
 ```{r echo = TRUE}
 (cb <- as_cubble(
@@ -504,7 +486,7 @@ knitr::include_graphics(here::here("figures/cubble-operations.png"))
 ))
 ```
 
-## Subsets on space
+## Subsets on space 
 
 ```{r echo = TRUE}
 vic_map <- ozmaps::abs_ste %>% 
@@ -518,74 +500,42 @@ vic_map <- ozmaps::abs_ste %>%
 #   filter(within)
 ```
 
-## Summarise in time
+## Summarise in time 
 
 ```{r echo = TRUE}
 (cb_tm <- cb %>% 
   face_temporal() %>% 
-  mutate(rolling_tmax_5 = slider::slide_dbl(tmax, mean, .after = 60, na.rm = TRUE)) )
+  group_by(month = lubridate::month(date)) %>% 
+  summarise(tmax = mean(tmax, na.rm = TRUE))
+  )
 ```
 
-## Move coordinates into time
+## Move coordinates into time 
 
 ```{r echo = TRUE}
 (cb_glyph <- cb_tm %>% unfold(long, lat))
 ```
 
-## Glyph map transformation
+## Glyph map transformation 
 
 ```{r}
 knitr::include_graphics(here::here("figures/glyph-steps.png"))
 ```
 
-## Glyph map in R 
-
-:::{.columns}
-:::{.column width="48%"}
 ```{r eval = FALSE, echo = TRUE}
-# use `GGally::glyphs()`
-GLYPH_DATA <- glyphs(
-  DATA, 
-  X_MAJOR, X_MINOR, 
-  Y_MAJOR, Y_MINOR)
-
-# GLYPH_DATA is a data frame with
-# columns gx, gy, and gid
-
-ggplot(GLYPH_DATA) +
-  geom_path(
-    aes(gx, gy, group = gid)
-    ) + 
-  ...
-```
-
-:::
-
-:::{.column width="4%"}
-:::
-
-:::{.column width="48%"}
-```{r eval = FALSE, echo = TRUE}
-# use `cubble::geom_glyph()`
 DATA %>% 
   ggplot() +
   geom_glyph(
-    aes(x_major = X_MAJOR, 
-        x_minor = X_MINOR,
-        y_major = Y_MAJOR, 
-        y_minor = Y_MINOR)) + 
+    aes(x_major = X_MAJOR, x_minor = X_MINOR, 
+        y_major = Y_MAJOR, y_minor = Y_MINOR)) + 
   ...
 ```
 
-:::
+## Making your first glyph map 
 
-:::
-
-## Making your first glyph map
-
-::: .columns
-::: {.column width="45%"}
-```{r echo = TRUE, eval = FALSE}
+```{r}
+#| code-fold: true
+#| echo: true
 cb <- as_cubble(
   list(spatial = stations_sf, temporal = ts),
   key = id, index = date, coords = c(long, lat)
@@ -593,51 +543,19 @@ cb <- as_cubble(
 
 cb_glyph <- cb %>% 
   face_temporal() %>% 
-  mutate(rolling_tmax = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
+  group_by(month = lubridate::month(date)) %>% 
+  summarise(tmax = mean(tmax, na.rm = TRUE)) %>% 
   unfold(long, lat)
 
 ggplot() + 
-  geom_sf(
-    data = oz_simp, 
-    fill = "grey95", 
-    color = "white") +
+  geom_sf(data = oz_simp, fill = "grey95", color = "white") +
   geom_glyph(
     data = cb_glyph,
-    aes(x_major = long, x_minor = as.numeric(date), 
-        y_major = lat, y_minor = rolling_tmax),
+    aes(x_major = long, x_minor = month, y_major = lat, y_minor = tmax),
     width = 2, height = 0.7) + 
   ggthemes::theme_map()
 ```
-:::
 
-
-::: {.column width="53%"}
-```{r}
-cb <- as_cubble(
-  list(spatial = stations_sf, temporal = ts),
-  key = id, index = date, coords = c(long, lat)
-)
-
-cb_glyph <- cb %>%
-  face_temporal() %>% 
-  mutate(rolling_tmax = slider::slide_dbl(tmax, mean, .after = 13, na.rm = TRUE)) %>% 
-  unfold(long, lat)
-
-ggplot() +
-  geom_sf(
-    data = oz_simp,
-    fill = "grey95",
-    color = "white") +
-  geom_glyph(
-    data = cb_glyph,
-    aes(x_major = long, x_minor = as.numeric(date),
-        y_major = lat, y_minor = rolling_tmax),
-    width = 2, height = 0.7) +
-  ggthemes::theme_map()
-```
-:::
-
-:::
 
 ## Your Time 
 
@@ -657,4 +575,6 @@ ggplot() +
   - `cubble`: https://huizezhang-sherry.github.io/cubble/
 
 ## Acknowledgements
-
+  
+  - The slides are made with [Quarto](https://quarto.org/) and are available at sherryzhang-RLadiesMelb2022.netlify.app
+  
