@@ -1,0 +1,26 @@
+/*-- scss:defaults --*/
+
+// fonts
+$font-family-sans-serif: "atkinson hyperlegible" !default;
+$spatial-color: #443750;
+// colors
+$body-color: #000 !default;
+$selection-bg: #26351c !default;
+
+// headings
+$presentation-heading-font: "noteworthy" !default;
+$presentation-heading-color: #383d3d !default;
+
+/*-- scss:rules --*/
+
+.reveal a {
+  line-height: 1 em;
+}
+
+.spatial{
+  color: $spatial-color;
+}
+
+.temporal{
+  color: #840032;
+}
