@@ -1,6 +1,6 @@
 ---
-title: "Switching between space and time: Spatio-temporal analysis with cubble"
-author: "Sherry Zhang"
+title: "Switching between space and time: Spatio-temporal analysis with <br> {{< fa earth-oceania >}} cubble {{< fa clock size=fa-xs >}}"
+author: '[{{< fa brands github >}}](https://github.com/huizezhang-sherry/) Sherry Zhang [{{< fa brands twitter >}}](https://twitter.com/huizezhangsh)'
 date: "2022-09-27"
 format: 
   revealjs:
@@ -10,6 +10,11 @@ format:
     aspectratio: 169
     theme: [default, style.scss]
     preview-links: auto
+    title-slide-attributes:
+      data-background-image: "figures/rladies-logo.png"
+      data-background-position: "top 0% right 0%"
+      data-background-size: "10%, 10%"
+    multiplex: true
 ---
 
 ```{r setup}
@@ -47,10 +52,30 @@ knitr::include_graphics(here::here("figures/headshot.jpg"))
 
 ## Roadmap
 
+::: columns
+:::{.column width="35%"}
 ```{r}
 knitr::include_graphics(here::here("figures/roadmap.png"))
 ```
+:::
 
+:::{.column width="7%"}
+:::
+
+
+:::{.column width="57%"}
+
+:::{.incremental}
+
+* Follow along with the slides at [https://sherryzhang-rladiesmelb2022.netlify.app](https://sherryzhang-rladiesmelb2022.netlify.app/)
+
+<br>
+
+* Run the code in the `index.R` yourself from the [slide repo](https://github.com/huizezhang-sherry/RLadiesMelb22)
+:::
+:::
+
+:::
 
 <!-- -   Dive into the data structure in `sf` -->
 
@@ -68,10 +93,6 @@ stations_sf <- cubble::climate_subset %>% select(-ts) %>%
 
 oz <- ozmaps::abs_ste %>% filter(NAME != "Other Territories")
 oz_simp <- oz %>% rmapshaper::ms_simplify(keep = 0.05) 
-
-svg <- readLines(here::here("figures/station-icon.svg"))
-station_svg <- paste(svg, collapse = "\n")
-#grid::grid.draw(svg_to_rasterGrob(station_svg))
 
 stations <- ggplot() +
   geom_sf(data = oz_simp, fill = "grey95", color = "white") +
@@ -534,7 +555,16 @@ https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html
 
 ```{r echo = TRUE}
 set.seed(0927)
-(cb_space <- cb %>% slice_sample(n = 20))
+cb_space <- cb %>% slice_sample(n = 20)
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = oz_simp, fill = "grey95", color = "white") +
+  geom_point(data = cb, aes(long,lat), color = "grey80") + 
+  geom_point(data = cb_space, aes(long, lat), color = "#4758AB") + 
+  ggthemes::theme_map() 
 ```
 
 ## Summarise in time 
@@ -618,5 +648,7 @@ https://huizezhang-sherry.github.io/cubble/articles/glyph.html
 
 ## Acknowledgements
   
-  - The slides are made with [Quarto](https://quarto.org/) and are available at [sherryzhang-RLadiesMelb2022.netlify.app](sherryzhang-RLadiesMelb2022.netlify.app)
+  - The slides are made with [Quarto](https://quarto.org/) 
+  
+  - All the materials used to prepare the slides are available at [sherryzhang-RLadiesMelb2022.netlify.app](sherryzhang-RLadiesMelb2022.netlify.app)
   

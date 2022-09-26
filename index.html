@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-  <meta charset="utf-8">
-  <meta name="generator" content="quarto-0.9.80">
-  <meta name="author" content="Sherry Zhang">
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/tabby.min.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="index_files/libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="index_files/libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.1.251">
+
+  <meta name="author" content=" Sherry Zhang ">
   <meta name="dcterms.date" content="2022-09-27">
-  <title>Switching between space and time: Spatio-temporal analysis with cubble</title>
+  <title>Switching between space and time: Spatio-temporal analysis with    cubble </title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
   <link rel="stylesheet" href="index_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="index_files/libs/revealjs/dist/reveal.css">
   <style>
-    .reveal .sourceCode {  /* see #7635 */
-      overflow: visible;
-    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -50,49 +61,42 @@
       }
     pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
     div.sourceCode
-      {   }
+      { color: #003b4f; background-color: #f1f3f5; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
     code span.bu { } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
     code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="index_files/libs/revealjs/dist/theme/quarto.css" id="theme">
-
-  <script src="index_files/libs/clipboard/clipboard.min.js"></script>
-  <script src="index_files/libs/quarto-html/tabby.min.js"></script>
-  <script src="index_files/libs/quarto-html/popper.min.js"></script>
-  <script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
-  <link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
-  <link href="index_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet">
-  <link href="index_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
   <link href="index_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="index_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="index_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -106,7 +110,7 @@
   }
 
   .callout.callout-style-simple { 
-    padding: 0em 0.7em;
+    padding: 0em 0.5em;
     border-left: solid #acacac .3rem;
     border-right: solid 1px silver;
     border-top: solid 1px silver;
@@ -217,8 +221,7 @@
     display: none !important;
   }
 
-  .callout.callout-captioned .callout-body > :last-child,
-  .callout.callout-captioned .callout-body > div > :last-child {
+  .callout.callout-captioned .callout-body > .callout-content > :last-child {
     margin-bottom: 0.5rem;
   }
 
@@ -308,12 +311,6 @@
       height: 100%;
       overflow-y: auto;
     }
-    .reveal #title-slide.center,
-    .reveal .title-slide.center,
-    .reveal .controls .navigate-left .controls-arrow,
-    .reveal .controls .navigate-right .controls-arrow {
-      margin-top: -15px;
-    }
     .reveal .slide.scrollable {
       overflow-y: auto;
     }
@@ -390,13 +387,13 @@
     }
   </style>
 </head>
-<body>
+<body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
-<section id="title-slide" class="center">
-  <h1 class="title">Switching between space and time: Spatio-temporal analysis with cubble</h1>
-  <p class="author">Sherry Zhang</p>
+<section id="title-slide" data-background-image="figures/rladies-logo.png" data-background-position="top 0% right 0%" data-background-size="10%, 10%" class="center">
+  <h1 class="title">Switching between space and time: Spatio-temporal analysis with <br> <i class="fa-solid fa-earth-oceania" aria-hidden="true"></i> cubble <i class="fa-solid fa-clock fa-fa-xs" aria-hidden="true"></i></h1>
+  <p class="author"><a href="https://github.com/huizezhang-sherry/"><i class="fa-brands fa-github" aria-hidden="true"></i></a> Sherry Zhang <a href="https://twitter.com/huizezhangsh"><i class="fa-brands fa-twitter" aria-hidden="true"></i></a></p>
   <p class="date">2022-09-27</p>
 </section>
 
@@ -424,11 +421,35 @@
 </section>
 <section id="roadmap" class="slide level2">
 <h2>Roadmap</h2>
+<div class="columns">
+<div class="column" style="width:35%;">
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="figures/roadmap.png" width="458"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:7%;">
 
+</div><div class="column" style="width:57%;">
+<div>
+<ul>
+<li class="fragment">Follow along with the slides at <a href="https://sherryzhang-rladiesmelb2022.netlify.app/">https://sherryzhang-rladiesmelb2022.netlify.app</a></li>
+</ul>
+<p><br></p>
+<ul>
+<li class="fragment">Run the code in the <code>index.R</code> yourself from the <a href="https://github.com/huizezhang-sherry/RLadiesMelb22">slide repo</a></li>
+</ul>
+</div>
+</div>
+</div>
 <!-- -   Dive into the data structure in `sf` -->
 <!-- -   Aggregate time series with `tsibble` -->
 <!-- -   Making a glyph map to explore time and space together -->
-<img data-src="figures/roadmap.png" width="458" class="r-stretch quarto-figure-center"></section>
+</section>
 <section id="spatio-temporal-data" class="slide level2">
 <h2>Spatio-temporal data</h2>
 <p>People talk about different things when they talk about spatio-temporal data!</p>
@@ -441,7 +462,17 @@
 <p>There are many different data that can sit under the big umbrella of spatio-temporal data.</p>
 <p>Here we have three different types: vector, raster, trajectory data (explain each)</p>
 <p>In ecology, there is also observation data where species are observed at different locations each time.</p>
-</aside>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="examples-of-vector-data" class="slide level2">
 <h2>Examples of vector data</h2>
@@ -460,7 +491,7 @@
 
 </div>
 <div class="cell" data-layout-align="center">
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 6
   id           long   lat  elev name                       wmo_id
   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                       &lt;dbl&gt;
@@ -472,7 +503,7 @@
 <li>Simple features</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 2 features and 4 fields
 Geometry type: POINT
 Dimension:     XY
@@ -504,7 +535,7 @@ Geodetic CRS:  GDA94
 <div class="columns">
 <div class="column" style="width:43%;">
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb3-2"><a href="#cb3-2"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> oz_simp) <span class="sc">+</span> </span>
 <span id="cb3-3"><a href="#cb3-3"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> stations_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -519,7 +550,7 @@ Geodetic CRS:  GDA94
 
 </div><div class="column" style="width:53%;">
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>dt_lbl <span class="ot">&lt;-</span> stations_sf <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(id) <span class="sc">%&gt;%</span> <span class="fu">sample_n</span>(<span class="dv">5</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb4-4"><a href="#cb4-4"></a>  <span class="fu">geom_sf</span>(</span>
@@ -544,8 +575,8 @@ Geodetic CRS:  GDA94
 <section id="look-into-an-sf-object---points" class="slide level2">
 <h2>Look into an sf object - POINTS</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dt <span class="co"># simple feature (sf)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dt <span class="co"># simple feature (sf)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 2 features and 6 fields
 Geometry type: POINT
 Dimension:     XY
@@ -559,7 +590,7 @@ Geodetic CRS:  GDA94
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>(pnt_sfc <span class="ot">&lt;-</span> dt<span class="sc">$</span>geometry) <span class="co"># simple feature column (sfc)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>(pnt_sfc <span class="ot">&lt;-</span> dt<span class="sc">$</span>geometry) <span class="co"># simple feature column (sfc)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>Geometry set for 2 features 
 Geometry type: POINT
@@ -569,7 +600,7 @@ Geodetic CRS:  GDA94
 POINT (152.8655 -31.4336)
 POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>(pnt_sfg <span class="ot">&lt;-</span> pnt_sfc[[<span class="dv">1</span>]]) <span class="co"># simple feature geometry (sfg) - POINTS</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>(pnt_sfg <span class="ot">&lt;-</span> pnt_sfc[[<span class="dv">1</span>]]) <span class="co"># simple feature geometry (sfg) - POINTS</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>POINT (152.8655 -31.4336)</code></pre>
 <aside class="notes">
@@ -577,26 +608,36 @@ POINT (150.9291 -34.3691)</code></pre>
 <p>The first one is the print of an sf object, lets call it <code>dt</code>, …</p>
 <p>explain what you can read here</p>
 <p>they may seem confusing as how can you perform operations on these objects, but they can be boiled down to the basic structure you’re already familiar with</p>
-</aside>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="look-into-an-sf-object---points-2" class="slide level2">
 <h2>Look into an sf object - POINTS (2)</h2>
 <p>The point sfg is a paired vector with special class labels</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>pnt_sfg <span class="co"># simple feature geometry (sfg) - POINTS</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>pnt_sfg <span class="co"># simple feature geometry (sfg) - POINTS</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>POINT (152.8655 -31.4336)</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">typeof</span>(pnt_sfg) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">typeof</span>(pnt_sfg) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] "double"</code></pre>
 </div>
-<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">unclass</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">unclass</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] 152.8655 -31.4336</code></pre>
 </div>
-<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">attributes</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">attributes</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>$class
 [1] "XY"    "POINT" "sfg"  </code></pre>
 </div>
@@ -607,7 +648,7 @@ POINT (150.9291 -34.3691)</code></pre>
 <h2>Look into an sf object - POINTS (3)</h2>
 <p>The POINT sfc is a list of sfg with special attributes</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pnt_sfc <span class="co"># simple feature column (sfc)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pnt_sfc <span class="co"># simple feature column (sfc)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>Geometry set for 1 feature 
 Geometry type: POINT
@@ -617,17 +658,17 @@ Geodetic CRS:  GDA94
 POINT (152.8655 -31.4336)
 POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">typeof</span>(pnt_sfc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">typeof</span>(pnt_sfc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] "list"</code></pre>
 </div>
-<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(pnt_sfc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(pnt_sfc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] "class"     "precision" "bbox"      "crs"       "n_empty"  </code></pre>
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb25"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">unclass</span>(pnt_sfc)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">unclass</span>(pnt_sfc)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>[[1]]
 POINT (152.8655 -31.4336)
@@ -642,16 +683,16 @@ POINT (150.9291 -34.3691)</code></pre>
 
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb27"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>(ls_sfg <span class="ot">&lt;-</span> ls_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>(ls_sfg <span class="ot">&lt;-</span> ls_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>LINESTRING (149.2317 -35.222, 149.2716 -35.2708, 149.3153 -35.27623, 149.3972 -35.32425, 149.3363 -35.33988, 149.2493 -35.33013, 149.2045 -35.34761, 149.1464 -35.4153, 149.1352, ...)</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb29"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">typeof</span>(ls_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="fu">typeof</span>(ls_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] "double"</code></pre>
 </div>
-<div class="sourceCode" id="cb31"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="fu">unclass</span>(ls_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="fu">unclass</span>(ls_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>          [,1]      [,2]
  [1,] 149.2317 -35.22200
  [2,] 149.2716 -35.27080
@@ -698,16 +739,16 @@ POINT (150.9291 -34.3691)</code></pre>
 
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb33"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>(pol_sfg <span class="ot">&lt;-</span> pol_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>(pol_sfg <span class="ot">&lt;-</span> pol_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>POLYGON ((149.2317 -35.222, 149.2716 -35.2708, 149.3153 -35.27623, 149.3972 -35.32425, 149.3363 -35.33988, 149.2493 -35.33013, ...))</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="fu">typeof</span>(pol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="fu">typeof</span>(pol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] "list"</code></pre>
 </div>
-<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="fu">unclass</span>(pol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="fu">unclass</span>(pol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
           [,1]      [,2]
  [1,] 149.2317 -35.22200
@@ -755,20 +796,20 @@ POINT (150.9291 -34.3691)</code></pre>
 
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb39"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>(mpol_sfg <span class="ot">&lt;-</span> mpol_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>(mpol_sfg <span class="ot">&lt;-</span> mpol_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -38.75672, 146.5454 -38.79089, 146.494 -38.77426, 146.4648 -38.73993, 146.5061 -38.72507, 146.5662 -38.74262)), ((145.2475 -38.50478, 145.2217 -38.52812, 145.1439 -38.50573, 145.1668 -38.46616, 145.2145 -38.44883, 145.277 -38.45114, 145.308 -38.51863, 145.2475 -38.50478)), ...)</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb41"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="fu">typeof</span>(mpol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="fu">typeof</span>(mpol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] "list"</code></pre>
 </div>
-<div class="sourceCode" id="cb43"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a><span class="fu">length</span>(<span class="fu">unclass</span>(mpol_sfg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a><span class="fu">length</span>(<span class="fu">unclass</span>(mpol_sfg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] 2</code></pre>
 </div>
-<div class="sourceCode" id="cb45"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="fu">unclass</span>(mpol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="fu">unclass</span>(mpol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [[1]][[1]]
          [,1]      [,2]
@@ -965,26 +1006,35 @@ POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
 
 </div>
-<div class="cell" data-layout-align="center" data-output-location="column-fragment">
-<div class="sourceCode" id="cb47"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>ts <span class="sc">%&gt;%</span> </span>
+<div class="cell columns column-output-location" data-layout-align="center">
+<div class="column">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>ts <span class="sc">%&gt;%</span> </span>
 <span id="cb47-2"><a href="#cb47-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> tmax, <span class="at">group =</span> id)) <span class="sc">+</span> </span>
 <span id="cb47-3"><a href="#cb47-3"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span> </span>
 <span id="cb47-4"><a href="#cb47-4"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
+</div><div class="column fragment">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-32-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <!-- Here it is daily data in 2020 from the stations we seen before. These weather stations measures precipitation, maximum and minimum temperature. -->
 <!-- Scripted from the BOM website -->
 <!-- In a tsibble format -->
-<img data-src="index_files/figure-revealjs/unnamed-chunk-32-1.png" width="960" class="r-stretch quarto-figure-center"></section>
+</section>
 <section id="hows-the-data-quality-from-bom" class="slide level2">
 <h2>How’s the data quality from BOM?</h2>
 <div class="cell" data-layout-align="center">
 
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb48"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>ts_tsibble <span class="ot">&lt;-</span> ts <span class="sc">%&gt;%</span> tsibble<span class="sc">::</span><span class="fu">as_tsibble</span>(<span class="at">key =</span> id, <span class="at">index =</span> date)</span>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>ts_tsibble <span class="ot">&lt;-</span> ts <span class="sc">%&gt;%</span> tsibble<span class="sc">::</span><span class="fu">as_tsibble</span>(<span class="at">key =</span> id, <span class="at">index =</span> date)</span>
 <span id="cb48-2"><a href="#cb48-2"></a>(missings <span class="ot">&lt;-</span> ts_tsibble <span class="sc">%&gt;%</span> tsibble<span class="sc">::</span><span class="fu">count_gaps</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 112 × 4
   id          .from      .to           .n
   &lt;chr&gt;       &lt;date&gt;     &lt;date&gt;     &lt;int&gt;
@@ -997,7 +1047,7 @@ POINT (150.9291 -34.3691)</code></pre>
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb50"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>missings <span class="ot">&lt;-</span> missings <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">.n =</span> <span class="fu">sum</span>(.n))</span>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>missings <span class="ot">&lt;-</span> missings <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">.n =</span> <span class="fu">sum</span>(.n))</span>
 <span id="cb50-2"><a href="#cb50-2"></a>missings <span class="sc">%&gt;%</span> </span>
 <span id="cb50-3"><a href="#cb50-3"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
 <span id="cb50-4"><a href="#cb50-4"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> .from, <span class="at">xmax =</span> .to, <span class="at">y =</span> <span class="fu">fct_reorder</span>(id, .n)), </span>
@@ -1019,22 +1069,22 @@ POINT (150.9291 -34.3691)</code></pre>
 <div class="columns">
 <div class="column" style="width:45%;">
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb51"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a>single <span class="ot">&lt;-</span> ts_tsibble <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a>single <span class="ot">&lt;-</span> ts_tsibble <span class="sc">%&gt;%</span> </span>
 <span id="cb51-2"><a href="#cb51-2"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">"ASN00003057"</span>)</span>
 <span id="cb51-3"><a href="#cb51-3"></a>single_filled <span class="ot">&lt;-</span> single <span class="sc">%&gt;%</span> </span>
 <span id="cb51-4"><a href="#cb51-4"></a>  tsibble<span class="sc">::</span><span class="fu">fill_gaps</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb52"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>single <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>single <span class="sc">%&gt;%</span> </span>
 <span id="cb52-2"><a href="#cb52-2"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="st">"2020-02-17"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb52-3"><a href="#cb52-3"></a>  <span class="fu">pull</span>(tmax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>numeric(0)</code></pre>
 </div>
-<div class="sourceCode" id="cb54"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a>single_filled <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a>single_filled <span class="sc">%&gt;%</span> </span>
 <span id="cb54-2"><a href="#cb54-2"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="st">"2020-02-17"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb54-3"><a href="#cb54-3"></a>  <span class="fu">pull</span>(tmax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] NA</code></pre>
 </div>
 </div>
@@ -1054,7 +1104,7 @@ POINT (150.9291 -34.3691)</code></pre>
 <section id="summarising-daily-data" class="slide level2">
 <h2>Summarising daily data</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb56"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a>ts <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a>ts <span class="sc">%&gt;%</span> </span>
 <span id="cb56-2"><a href="#cb56-2"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date), id) <span class="sc">%&gt;%</span> </span>
 <span id="cb56-3"><a href="#cb56-3"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb56-4"><a href="#cb56-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> tmax, <span class="at">group =</span> id)) <span class="sc">+</span> </span>
@@ -1083,11 +1133,11 @@ POINT (150.9291 -34.3691)</code></pre>
 <section id="cast-your-data-into-a-cubble" class="slide level2">
 <h2>Cast your data into a cubble</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb57"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a>(cb <span class="ot">&lt;-</span> <span class="fu">as_cubble</span>(</span>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a>(cb <span class="ot">&lt;-</span> <span class="fu">as_cubble</span>(</span>
 <span id="cb57-2"><a href="#cb57-2"></a>  <span class="fu">list</span>(<span class="at">spatial =</span> stations_sf, <span class="at">temporal =</span> ts),</span>
 <span id="cb57-3"><a href="#cb57-3"></a>  <span class="at">key =</span> id, <span class="at">index =</span> date, <span class="at">coords =</span> <span class="fu">c</span>(long, lat)</span>
 <span id="cb57-4"><a href="#cb57-4"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code># cubble:   id [30]: nested form [sf]
 # bbox:     [114.09, -41.88, 152.87, -11.65]
 # temporal: date [date], prcp [dbl], tmax [dbl], tmin [dbl]
@@ -1110,37 +1160,20 @@ POINT (150.9291 -34.3691)</code></pre>
 <section id="subset-on-space" class="slide level2">
 <h2>Subset on space</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb59"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a><span class="fu">set.seed</span>(<span class="dv">0927</span>)</span>
-<span id="cb59-2"><a href="#cb59-2"></a>(cb_space <span class="ot">&lt;-</span> cb <span class="sc">%&gt;%</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
-<pre><code># cubble:   id [20]: nested form
-# bbox:     [114.09, -41.65, 152.72, -11.65]
-# temporal: date [date], prcp [dbl], tmax [dbl], tmin [dbl]
-   id            lat  long  elev name  wmo_id            geometry ts      
-   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;         &lt;POINT [°]&gt; &lt;list&gt;  
- 1 ASN00005007 -22.2  114.   5   lear…  94302 (114.0967 -22.2406) &lt;tibble&gt;
- 2 ASN00005084 -21.5  115.   5   thev…  94303 (115.0197 -21.4606) &lt;tibble&gt;
- 3 ASN00012314 -27.8  121. 497   lein…  95448 (120.7031 -27.8386) &lt;tibble&gt;
- 4 ASN00014401 -11.7  133.  19.2 warr…  94139 (133.3796 -11.6502) &lt;tibble&gt;
- 5 ASN00018201 -32.5  138.  14   port…  95666 (137.7144 -32.5091) &lt;tibble&gt;
- 6 ASN00026095 -37.0  140.  17   cape…  94813 (139.7164 -36.9655) &lt;tibble&gt;
- 7 ASN00036026 -24.3  144. 203   isis…  94345 (144.4406 -24.2591) &lt;tibble&gt;
- 8 ASN00039059 -24.1  153.   3.9 lady…  94388 (152.7161 -24.1116) &lt;tibble&gt;
- 9 ASN00043015 -25.8  149. 393   inju…  94511 (148.5669 -25.8428) &lt;tibble&gt;
-10 ASN00044026 -28.1  146. 189.  cunn…  94500 (145.6808 -28.0706) &lt;tibble&gt;
-# … with 10 more rows</code></pre>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a><span class="fu">set.seed</span>(<span class="dv">0927</span>)</span>
+<span id="cb59-2"><a href="#cb59-2"></a>cb_space <span class="ot">&lt;-</span> cb <span class="sc">%&gt;%</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</section>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-46-1.png" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="summarise-in-time" class="slide level2">
 <h2>Summarise in time</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb61"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a>(cb_tm <span class="ot">&lt;-</span> cb_space <span class="sc">%&gt;%</span> </span>
-<span id="cb61-2"><a href="#cb61-2"></a>  <span class="fu">face_temporal</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb61-3"><a href="#cb61-3"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date)) <span class="sc">%&gt;%</span> </span>
-<span id="cb61-4"><a href="#cb61-4"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb61-5"><a href="#cb61-5"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>(cb_tm <span class="ot">&lt;-</span> cb_space <span class="sc">%&gt;%</span> </span>
+<span id="cb60-2"><a href="#cb60-2"></a>  <span class="fu">face_temporal</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb60-3"><a href="#cb60-3"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date)) <span class="sc">%&gt;%</span> </span>
+<span id="cb60-4"><a href="#cb60-4"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb60-5"><a href="#cb60-5"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code># cubble:  month, id [20]: long form
 # bbox:    [114.09, -41.65, 152.72, -11.65]
 # spatial: lat [dbl], long [dbl], elev [dbl], name [chr], wmo_id [dbl],
@@ -1164,8 +1197,8 @@ POINT (150.9291 -34.3691)</code></pre>
 <section id="move-coordinates-into-time" class="slide level2">
 <h2>Move coordinates into time</h2>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb63"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1"></a>(cb_glyph <span class="ot">&lt;-</span> cb_tm <span class="sc">%&gt;%</span> <span class="fu">unfold</span>(long, lat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a>(cb_glyph <span class="ot">&lt;-</span> cb_tm <span class="sc">%&gt;%</span> <span class="fu">unfold</span>(long, lat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
 <pre><code># cubble:  month, id [20]: long form
 # bbox:    [114.09, -41.65, 152.72, -11.65]
 # spatial: lat [dbl], long [dbl], elev [dbl], name [chr], wmo_id [dbl],
@@ -1190,12 +1223,12 @@ POINT (150.9291 -34.3691)</code></pre>
 <h2>Glyph map transformation</h2>
 
 <img data-src="figures/glyph-steps.png" width="1546" class="r-stretch quarto-figure-center"><div class="cell" data-layout-align="center">
-<div class="sourceCode" id="cb65"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1"></a>DATA <span class="sc">%&gt;%</span> </span>
-<span id="cb65-2"><a href="#cb65-2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb65-3"><a href="#cb65-3"></a>  <span class="fu">geom_glyph</span>(</span>
-<span id="cb65-4"><a href="#cb65-4"></a>    <span class="fu">aes</span>(<span class="at">x_major =</span> X_MAJOR, <span class="at">x_minor =</span> X_MINOR, </span>
-<span id="cb65-5"><a href="#cb65-5"></a>        <span class="at">y_major =</span> Y_MAJOR, <span class="at">y_minor =</span> Y_MINOR)) <span class="sc">+</span> </span>
-<span id="cb65-6"><a href="#cb65-6"></a>  ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a>DATA <span class="sc">%&gt;%</span> </span>
+<span id="cb64-2"><a href="#cb64-2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb64-3"><a href="#cb64-3"></a>  <span class="fu">geom_glyph</span>(</span>
+<span id="cb64-4"><a href="#cb64-4"></a>    <span class="fu">aes</span>(<span class="at">x_major =</span> X_MAJOR, <span class="at">x_minor =</span> X_MINOR, </span>
+<span id="cb64-5"><a href="#cb64-5"></a>        <span class="at">y_major =</span> Y_MAJOR, <span class="at">y_minor =</span> Y_MINOR)) <span class="sc">+</span> </span>
+<span id="cb64-6"><a href="#cb64-6"></a>  ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="making-your-first-glyph-map" class="slide level2">
@@ -1203,30 +1236,30 @@ POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
 <details>
 <summary>Code</summary>
-<div class="sourceCode" id="cb66"><pre class="sourceCode numberSource r cell-code number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a>cb <span class="ot">&lt;-</span> <span class="fu">as_cubble</span>(</span>
-<span id="cb66-2"><a href="#cb66-2"></a>  <span class="fu">list</span>(<span class="at">spatial =</span> stations_sf, <span class="at">temporal =</span> ts),</span>
-<span id="cb66-3"><a href="#cb66-3"></a>  <span class="at">key =</span> id, <span class="at">index =</span> date, <span class="at">coords =</span> <span class="fu">c</span>(long, lat)</span>
-<span id="cb66-4"><a href="#cb66-4"></a>)</span>
-<span id="cb66-5"><a href="#cb66-5"></a></span>
-<span id="cb66-6"><a href="#cb66-6"></a><span class="fu">set.seed</span>(<span class="dv">0927</span>)</span>
-<span id="cb66-7"><a href="#cb66-7"></a>cb_glyph <span class="ot">&lt;-</span> cb <span class="sc">%&gt;%</span> </span>
-<span id="cb66-8"><a href="#cb66-8"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb66-9"><a href="#cb66-9"></a>  <span class="fu">face_temporal</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb66-10"><a href="#cb66-10"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date)) <span class="sc">%&gt;%</span> </span>
-<span id="cb66-11"><a href="#cb66-11"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb66-12"><a href="#cb66-12"></a>  <span class="fu">unfold</span>(long, lat)</span>
-<span id="cb66-13"><a href="#cb66-13"></a></span>
-<span id="cb66-14"><a href="#cb66-14"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb66-15"><a href="#cb66-15"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> oz_simp, <span class="at">fill =</span> <span class="st">"grey95"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb66-16"><a href="#cb66-16"></a>  <span class="fu">geom_glyph</span>(</span>
-<span id="cb66-17"><a href="#cb66-17"></a>    <span class="at">data =</span> cb_glyph,</span>
-<span id="cb66-18"><a href="#cb66-18"></a>    <span class="fu">aes</span>(<span class="at">x_major =</span> long, <span class="at">x_minor =</span> month, <span class="at">y_major =</span> lat, <span class="at">y_minor =</span> tmax),</span>
-<span id="cb66-19"><a href="#cb66-19"></a>    <span class="at">width =</span> <span class="dv">2</span>, <span class="at">height =</span> <span class="fl">0.7</span>) <span class="sc">+</span> </span>
-<span id="cb66-20"><a href="#cb66-20"></a>  ggthemes<span class="sc">::</span><span class="fu">theme_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1"></a>cb <span class="ot">&lt;-</span> <span class="fu">as_cubble</span>(</span>
+<span id="cb65-2"><a href="#cb65-2"></a>  <span class="fu">list</span>(<span class="at">spatial =</span> stations_sf, <span class="at">temporal =</span> ts),</span>
+<span id="cb65-3"><a href="#cb65-3"></a>  <span class="at">key =</span> id, <span class="at">index =</span> date, <span class="at">coords =</span> <span class="fu">c</span>(long, lat)</span>
+<span id="cb65-4"><a href="#cb65-4"></a>)</span>
+<span id="cb65-5"><a href="#cb65-5"></a></span>
+<span id="cb65-6"><a href="#cb65-6"></a><span class="fu">set.seed</span>(<span class="dv">0927</span>)</span>
+<span id="cb65-7"><a href="#cb65-7"></a>cb_glyph <span class="ot">&lt;-</span> cb <span class="sc">%&gt;%</span> </span>
+<span id="cb65-8"><a href="#cb65-8"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb65-9"><a href="#cb65-9"></a>  <span class="fu">face_temporal</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb65-10"><a href="#cb65-10"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date)) <span class="sc">%&gt;%</span> </span>
+<span id="cb65-11"><a href="#cb65-11"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb65-12"><a href="#cb65-12"></a>  <span class="fu">unfold</span>(long, lat)</span>
+<span id="cb65-13"><a href="#cb65-13"></a></span>
+<span id="cb65-14"><a href="#cb65-14"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb65-15"><a href="#cb65-15"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> oz_simp, <span class="at">fill =</span> <span class="st">"grey95"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb65-16"><a href="#cb65-16"></a>  <span class="fu">geom_glyph</span>(</span>
+<span id="cb65-17"><a href="#cb65-17"></a>    <span class="at">data =</span> cb_glyph,</span>
+<span id="cb65-18"><a href="#cb65-18"></a>    <span class="fu">aes</span>(<span class="at">x_major =</span> long, <span class="at">x_minor =</span> month, <span class="at">y_major =</span> lat, <span class="at">y_minor =</span> tmax),</span>
+<span id="cb65-19"><a href="#cb65-19"></a>    <span class="at">width =</span> <span class="dv">2</span>, <span class="at">height =</span> <span class="fl">0.7</span>) <span class="sc">+</span> </span>
+<span id="cb65-20"><a href="#cb65-20"></a>  ggthemes<span class="sc">::</span><span class="fu">theme_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-50-1.png" width="960" class="r-stretch quarto-figure-center"><div class="footer">
+<img data-src="index_files/figure-revealjs/unnamed-chunk-51-1.png" width="960" class="r-stretch quarto-figure-center"><div class="footer">
 <p>https://huizezhang-sherry.github.io/cubble/articles/glyph.html</p>
 </div>
 </section>
@@ -1251,7 +1284,8 @@ POINT (150.9291 -34.3691)</code></pre>
 <section id="acknowledgements" class="slide level2">
 <h2>Acknowledgements</h2>
 <ul>
-<li>The slides are made with <a href="https://quarto.org/">Quarto</a> and are available at <a href="sherryzhang-RLadiesMelb2022.netlify.app">sherryzhang-RLadiesMelb2022.netlify.app</a></li>
+<li><p>The slides are made with <a href="https://quarto.org/">Quarto</a></p></li>
+<li><p>All the materials used to prepare the slides are available at <a href="sherryzhang-RLadiesMelb2022.netlify.app">sherryzhang-RLadiesMelb2022.netlify.app</a></p></li>
 </ul>
 <div class="footer footer-default">
 
@@ -1262,19 +1296,21 @@ POINT (150.9291 -34.3691)</code></pre>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
   <script src="index_files/libs/revealjs/dist/reveal.js"></script>
-
   <!-- reveal.js plugins -->
   <script src="index_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
   <script src="index_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="index_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="index_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="index_files/libs/revealjs/plugin/multiplex/socket.io.js"></script>
+  <script src="index_files/libs/revealjs/plugin/multiplex/multiplex.js"></script>
   <script src="index_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
   <script src="index_files/libs/revealjs/plugin/notes/notes.js"></script>
   <script src="index_files/libs/revealjs/plugin/search/search.js"></script>
   <script src="index_files/libs/revealjs/plugin/zoom/zoom.js"></script>
   <script src="index_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
-
 
   <script>
 
@@ -1288,10 +1324,10 @@ POINT (150.9291 -34.3691)</code></pre>
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
-
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'multiplex': {"secret":null,"id":"7129a60c7600b5d7","url":"https://reveal-multiplex.glitch.me/"},
 'smaller': false,
-
+ 
         // Display controls in the bottom right corner
         controls: false,
 
@@ -1463,7 +1499,7 @@ POINT (150.9291 -34.3691)</code></pre>
         plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
           RevealMath,
-          RevealNotes,
+          
           RevealSearch,
           RevealZoom
         ]
@@ -1511,8 +1547,26 @@ POINT (150.9291 -34.3691)</code></pre>
       })();
     </script>
 
-    <script type="application/javascript">
+    <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
       const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
       tabsets.forEach(function(tabset) {
         const tabby = new Tabby('#' + tabset.id);
@@ -1529,7 +1583,10 @@ POINT (150.9291 -34.3691)</code></pre>
         button.blur();
         // flash "checked"
         button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
         setTimeout(function() {
+          button.setAttribute("title", currentTitle);
           button.classList.remove('code-copy-button-checked');
         }, 1000);
         // clear code selection
@@ -1558,7 +1615,8 @@ POINT (150.9291 -34.3691)</code></pre>
       for (var i=0; i<noterefs.length; i++) {
         const ref = noterefs[i];
         tippyHover(ref, function() {
-          let href = ref.getAttribute('href');
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
           try { href = new URL(href).hash; } catch {}
           const id = href.replace(/^#\/?/, "");
           const note = window.document.getElementById(id);
