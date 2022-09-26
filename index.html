@@ -404,7 +404,7 @@
 <div class="column" style="width:65%;">
 <ul>
 <li><p>A 3rd year PhD student in the Department of Econometrics and Business Statistics, Monash University</p></li>
-<li><p>My research centers on exploring multivariate spatio-temporal with data wrangling and visualisation tool.</p></li>
+<li><p>My research centers on exploring multivariate spatio-temporal data with data wrangling and visualisation tool.</p></li>
 </ul>
 </div><div class="column" style="width:35%;">
 <div class="cell" data-layout-align="center">
@@ -441,27 +441,41 @@
 </ul>
 <p><br></p>
 <ul>
-<li class="fragment">Run the code in the <code>index.R</code> yourself from the <a href="https://github.com/huizezhang-sherry/RLadiesMelb22">slide repo</a></li>
+<li class="fragment">Go to the <a href="https://github.com/huizezhang-sherry/RLadiesMelb22">slide repo</a> to run the code in the <code>index.R</code> yourself</li>
 </ul>
 </div>
 </div>
 </div>
-<!-- -   Dive into the data structure in `sf` -->
-<!-- -   Aggregate time series with `tsibble` -->
-<!-- -   Making a glyph map to explore time and space together -->
+<aside class="notes">
+<p>After some introduction, I will first talk about spatial data with the sf package and then temporal data with the tsibble package before</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="spatio-temporal-data" class="slide level2">
 <h2>Spatio-temporal data</h2>
-<p>People talk about different things when they talk about spatio-temporal data!</p>
+<p>People can talk about a whole range of differnt things when they only refer to their data as spatio-temporal!</p>
 <div class="cell" data-layout-align="center">
 
 </div>
 
 <img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch quarto-figure-center"><p>The focus of today will be on vector data</p>
 <aside class="notes">
-<p>There are many different data that can sit under the big umbrella of spatio-temporal data.</p>
+<p>Data with different spatial and temporal characteristics can all sit under the big umbrella of spatio-temporal data.</p>
 <p>Here we have three different types: vector, raster, trajectory data (explain each)</p>
-<p>In ecology, there is also observation data where species are observed at different locations each time.</p>
+<p>vector data have time series measured at a collection of locations</p>
+<p>raster data use gridded cells to represent a continuous space and each cell has variables measured at different time point. You can think of it as take snapshots of space at various time points and stack them on top of each other</p>
+<p>trajectory data, on the other hand, have points moving in the space and time in the same time. Here each point on these line would have a different long, lat and time marker.</p>
+<p>These are three different representation of spatio-temporal data and they have their own tools for wrangling and visualisation</p>
+<p>That’s why I always feel</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -476,14 +490,29 @@
 </section>
 <section id="examples-of-vector-data" class="slide level2">
 <h2>Examples of vector data</h2>
-<p>Physical sensors that measure the temperature, rainfall, wind speed &amp; direction, river level, etc</p>
+<p>Physical sensors that measure the temperature, rainfall, wind speed &amp; direction, water level, etc</p>
 
 <img data-src="index_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch quarto-figure-center"><div class="footer">
 <p>A recent <a href="https://r-spatial.org//r/2022/09/12/vdc.html">blog post</a> on Vector Data Cubes by Edzer Pebesma</p>
 </div>
+<aside class="notes">
+<p>A major source of vector spatio-temporal data is physical sensors that measures a range of climate variables</p>
+<p>With these data, typically you will get the spatial data by choosing a list of stations of your interest and then query the temporal data.</p>
+<p>Now we will first talk about the spatial component before moving to the temporal component.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="represent-vector-data-in-r" class="slide level2">
-<h2>Represent vector data in R?</h2>
+<section id="represent-spatial-data-in-r" class="slide level2">
+<h2>Represent spatial data in R?</h2>
 <ul>
 <li>A pair of longitude/ latitude</li>
 </ul>
@@ -500,7 +529,7 @@
 </div>
 </div>
 <ul>
-<li>Simple features</li>
+<li>Simple features with <code>sf</code></li>
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="cell-output cell-output-stdout">
@@ -516,19 +545,42 @@ Geodetic CRS:  GDA94
 2 ASN00068228  10   bellambi aws                94749 (150.9291 -34.3691)</code></pre>
 </div>
 </div>
-<!-- -   S2 vector -->
-<!-- ```{r} -->
-<!-- dt %>% st_drop_geometry() %>% mutate(s2 = s2::s2_lnglat(long, lat)) -->
-<!-- ``` -->
-<!-- today mainly talk about sf -->
+<aside class="notes">
+<p>There are two ways you can represent spatial data in R.</p>
+<p>The first is to use two separate longitude and latitude columns</p>
+<p>Another way is to use the simple feature representation with the sf package.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="geometrical-operations-with-sf" class="slide level2">
 <h2>Geometrical operations with <code>sf</code></h2>
-<!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
 
 <img data-src="figures/geometrical-operations.png" style="width:200.0%" class="r-stretch quarto-figure-center"><div class="footer">
-<p>https://r-spatial.github.io/sf/reference/index.html</p>
+<p><a href="https://r-spatial.github.io/sf/reference/index.html">https://r-spatial.github.io/sf/reference/index.html</a></p>
 </div>
+<aside class="notes">
+<p>The benefit of using the sf package is that the package also give you access to many geometrical operations.</p>
+<p>Here I have a few examples ..</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="ploting-an-sf-object" class="slide level2">
 <h2>Ploting an <code>sf</code> object</h2>
@@ -570,7 +622,20 @@ Geodetic CRS:  GDA94
 </div>
 </div>
 </div>
-<!-- geom_sf() will look for the "active geometry" column in the sf object and plot that  -->
+<aside class="notes">
+<p>Also the <code>geom_sf</code> function allow you to supply an sf object and will automatically plot the geometry</p>
+<p>The <code>goem_sf_label</code> allows you to put the label on the points and there are themes and aesthetics you can use to make the map pretty.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="look-into-an-sf-object---points" class="slide level2">
 <h2>Look into an sf object - POINTS</h2>
@@ -600,14 +665,15 @@ Geodetic CRS:  GDA94
 POINT (152.8655 -31.4336)
 POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>(pnt_sfg <span class="ot">&lt;-</span> pnt_sfc[[<span class="dv">1</span>]]) <span class="co"># simple feature geometry (sfg) - POINTS</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>(pnt_sfg <span class="ot">&lt;-</span> pnt_sfc[[<span class="dv">1</span>]]) <span class="co"># simple feature geometry (sfg) - POINT</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <pre><code>POINT (152.8655 -31.4336)</code></pre>
 <aside class="notes">
-<p>When working with an sf object, these are the three common prints you may see</p>
+<p>For beginners, the sf header and the geometry representation could be difficult to work with</p>
+<p>Here are three common prints you may see</p>
 <p>The first one is the print of an sf object, lets call it <code>dt</code>, …</p>
 <p>explain what you can read here</p>
-<p>they may seem confusing as how can you perform operations on these objects, but they can be boiled down to the basic structure you’re already familiar with</p>
+<p>It may seem confusing as how can you perform operations on these objects, especially the sfc and the sfg. What is underneath these prints? I will now show you that these representations can all be boiled down to the basic structure you’re already familiar with</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -632,21 +698,21 @@ POINT (150.9291 -34.3691)</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "double"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">unclass</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 152.8655 -31.4336</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">attributes</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">attributes</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$class
 [1] "XY"    "POINT" "sfg"  </code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">unclass</span>(pnt_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 152.8655 -31.4336</code></pre>
 </div>
-<p>The <code>POINT (152.8655 -31.4336)</code> format is called well-known text, which is a human-readable encoding used by sf</p>
+</div>
+<p>The <code>POINT (152.8655 -31.4336)</code> format is called well-known text, which is a human-readable encoding used by <code>sf</code></p>
 </section>
 <section id="look-into-an-sf-object---points-3" class="slide level2">
 <h2>Look into an sf object - POINTS (3)</h2>
-<p>The POINT sfc is a list of sfg with special attributes</p>
+<p>The sfc is a list of sfg with special attributes</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>pnt_sfc <span class="co"># simple feature column (sfc)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -676,8 +742,8 @@ POINT (152.8655 -31.4336)
 [[2]]
 POINT (150.9291 -34.3691)</code></pre>
 </section>
-<section id="other-geoms---linestring" class="slide level2">
-<h2>Other geoms - LINESTRING</h2>
+<section id="other-geoms-13---linestring" class="slide level2">
+<h2>Other geoms (1/3) - LINESTRING</h2>
 <p>The linestring sfg is a matrix of paired doubles</p>
 <div class="cell" data-layout-align="center">
 
@@ -732,8 +798,8 @@ POINT (150.9291 -34.3691)</code></pre>
 </div>
 </div>
 </section>
-<section id="other-geoms---polygons" class="slide level2">
-<h2>Other geoms - POLYGONS</h2>
+<section id="other-geoms-23---polygons" class="slide level2">
+<h2>Other geoms (2/3) - POLYGONS</h2>
 <p>POLYGON sfg is a list where each element is a matrix of paired vectors</p>
 <div class="cell" data-layout-align="center">
 
@@ -789,8 +855,8 @@ POINT (150.9291 -34.3691)</code></pre>
 </div>
 </div>
 </section>
-<section id="other-geoms---multipolygons" class="slide level2">
-<h2>Other geoms - MULTIPOLYGONS</h2>
+<section id="and-lastly-multipolygons" class="slide level2">
+<h2>And lastly … MULTIPOLYGONS!</h2>
 <p>MULTIPOLYGON sfg is a nested list where each list element can contain multiple matrices of paired vectors</p>
 <div class="cell" data-layout-align="center">
 
@@ -798,7 +864,7 @@ POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>(mpol_sfg <span class="ot">&lt;-</span> mpol_sfc[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<pre><code>MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -38.75672, 146.5454 -38.79089, 146.494 -38.77426, 146.4648 -38.73993, 146.5061 -38.72507, 146.5662 -38.74262)), ((145.2475 -38.50478, 145.2217 -38.52812, 145.1439 -38.50573, 145.1668 -38.46616, 145.2145 -38.44883, 145.277 -38.45114, 145.308 -38.51863, 145.2475 -38.50478)), ...)</code></pre>
+<pre><code>MULTIPOLYGON (((145.2859 -38.3962, 145.2903 -38.28367, 145.4109 -38.37078, 145.2859 -38.3962)), ((140.9657 -38.05599, 140.9739 -37.46209, 140.9693 -36.79305, 140.9631 -35.74853, 140.9656 -35.00826, 140.9617 -34.09582, ...)))</code></pre>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="fu">typeof</span>(mpol_sfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -990,7 +1056,7 @@ POINT (150.9291 -34.3691)</code></pre>
 <!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
 
 <img data-src="figures/geometrical-operations.png" style="width:200.0%" class="r-stretch quarto-figure-center"><div class="footer">
-<p>https://r-spatial.github.io/sf/reference/index.html</p>
+<p><a href="https://r-spatial.github.io/sf/reference/index.html">https://r-spatial.github.io/sf/reference/index.html</a></p>
 </div>
 </section></section>
 <section>
@@ -1006,26 +1072,17 @@ POINT (150.9291 -34.3691)</code></pre>
 <div class="cell" data-layout-align="center">
 
 </div>
-<div class="cell columns column-output-location" data-layout-align="center">
-<div class="column">
+<div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>ts <span class="sc">%&gt;%</span> </span>
 <span id="cb47-2"><a href="#cb47-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> tmax, <span class="at">group =</span> id)) <span class="sc">+</span> </span>
 <span id="cb47-3"><a href="#cb47-3"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span> </span>
 <span id="cb47-4"><a href="#cb47-4"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div><div class="column fragment">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="index_files/figure-revealjs/unnamed-chunk-32-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
+
 </div>
 <!-- Here it is daily data in 2020 from the stations we seen before. These weather stations measures precipitation, maximum and minimum temperature. -->
 <!-- Scripted from the BOM website -->
 <!-- In a tsibble format -->
-</section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-32-1.png" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="hows-the-data-quality-from-bom" class="slide level2">
 <h2>How’s the data quality from BOM?</h2>
 <div class="cell" data-layout-align="center">

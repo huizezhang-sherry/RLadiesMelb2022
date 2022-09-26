@@ -38,7 +38,7 @@ library(tsibble)
 ::: {.column width="65%"}
 -   A 3rd year PhD student in the Department of Econometrics and Business Statistics, Monash University
 
--   My research centers on exploring multivariate spatio-temporal with data wrangling and visualisation tool. 
+-   My research centers on exploring multivariate spatio-temporal data with data wrangling and visualisation tool. 
 :::
 
 ::: {.column width="35%"}
@@ -71,21 +71,19 @@ knitr::include_graphics(here::here("figures/roadmap.png"))
 
 <br>
 
-* Run the code in the `index.R` yourself from the [slide repo](https://github.com/huizezhang-sherry/RLadiesMelb22)
+* Go to the [slide repo](https://github.com/huizezhang-sherry/RLadiesMelb22) to run the code in the `index.R` yourself
 :::
 :::
 
 :::
 
-<!-- -   Dive into the data structure in `sf` -->
-
-<!-- -   Aggregate time series with `tsibble` -->
-
-<!-- -   Making a glyph map to explore time and space together -->
+:::{.notes}
+After some introduction, I will first talk about spatial data with the sf package and then temporal data with the tsibble package before
+:::
 
 ## Spatio-temporal data
 
-People talk about different things when they talk about spatio-temporal data! 
+People can talk about a whole range of differnt things when they only refer to their data as spatio-temporal! 
 
 ```{r}
 stations_sf <- cubble::climate_subset %>% select(-ts) %>% 
@@ -124,16 +122,25 @@ stations | raster | trajectory
 The focus of today will be on vector data
 
 ::: {.notes}
-There are many different data that can sit under the big umbrella of spatio-temporal data.
+Data with different spatial and temporal characteristics can all sit under the big umbrella of spatio-temporal data.
 
 Here we have three different types: vector, raster, trajectory data (explain each)
 
-In ecology, there is also observation data where species are observed at different locations each time. 
+vector data have time series measured at a collection of locations
+
+raster data use gridded cells to represent a continuous space and each cell has variables measured at different time point. You can think of it as take snapshots of space at various time points and stack them on top of each other
+
+trajectory data, on the other hand, have points moving in the space and time in the same time. Here each point on these line would have a different long, lat and time marker.
+
+These are three different representation of spatio-temporal data and they have their own tools for wrangling and visualisation
+
+That's why I always feel
 
 :::
+
 ## Examples of vector data
 
-Physical sensors that measure the temperature, rainfall, wind speed & direction, river level, etc
+Physical sensors that measure the temperature, rainfall, wind speed & direction, water level, etc
 
 ```{r}
 svg <- readLines(here::here("figures/sun-svgrepo-com.svg"))
@@ -156,8 +163,16 @@ gridExtra::grid.arrange(p1, white , p2, white, p3, white, p4, nrow = 1)
 A recent [blog post](https://r-spatial.org//r/2022/09/12/vdc.html) on Vector Data Cubes by Edzer Pebesma
 :::
 
+:::{.notes}
+A major source of vector spatio-temporal data is physical sensors that measures a range of climate variables
 
-## Represent vector data in R?
+With these data, typically you will get the spatial data by choosing a list of stations of your interest and then query the temporal data.
+
+Now we will first talk about the spatial component before moving to the temporal component.
+
+:::
+
+## Represent spatial data in R?
 
 -   A pair of longitude/ latitude
 
@@ -169,30 +184,37 @@ dt <- stations_sf %>% head(2)
 dt %>% st_drop_geometry() %>% select(id, long, lat, elev, name, wmo_id)
 ```
 
--   Simple features
+-   Simple features with `sf`
 
 ```{r}
 dt %>% select(-long, -lat)
 ```
 
-<!-- -   S2 vector -->
+:::{.notes}
+There are two ways you can represent spatial data in R. 
 
-<!-- ```{r} -->
-<!-- dt %>% st_drop_geometry() %>% mutate(s2 = s2::s2_lnglat(long, lat)) -->
-<!-- ``` -->
+The first is to use two separate longitude and latitude columns 
 
-<!-- today mainly talk about sf -->
+Another way is to use the simple feature representation with the sf package.
+
+
+:::
 
 ## Geometrical operations with `sf`
-
-<!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
 
 ```{r, out.width="200%"}
 knitr::include_graphics(here::here("figures/geometrical-operations.png"))
 ```
 
 :::footer
-https://r-spatial.github.io/sf/reference/index.html
+[https://r-spatial.github.io/sf/reference/index.html](https://r-spatial.github.io/sf/reference/index.html)
+:::
+
+:::{.notes}
+The benefit of using the sf package is that the package also give you access to many geometrical operations.
+
+Here I have a few examples ..
+
 :::
 
 ## Ploting an `sf` object 
@@ -224,7 +246,13 @@ ggplot() +
 :::
 :::
 
-<!-- geom_sf() will look for the "active geometry" column in the sf object and plot that  -->
+:::{.notes}
+Also the `geom_sf` function allow you to supply an sf object and will automatically plot the geometry
+
+The `goem_sf_label` allows you to put the label on the points and there are themes and aesthetics you can use to make the map pretty.
+
+
+:::
 
 ## Look into an sf object - POINTS 
 
@@ -245,19 +273,22 @@ dt # simple feature (sf)
     POINT (150.9291 -34.3691)
 
 ```{r echo = TRUE}
-(pnt_sfg <- pnt_sfc[[1]]) # simple feature geometry (sfg) - POINTS
+(pnt_sfg <- pnt_sfc[[1]]) # simple feature geometry (sfg) - POINT
 ```
 
     POINT (152.8655 -31.4336)
 
 ::: {.notes}
-When working with an sf object, these are the three common prints you may see 
+
+For beginners, the sf header and the geometry representation could be difficult to work with 
+
+Here are three common prints you may see 
 
 The first one is the print of an sf object, lets call it `dt`, ...
 
 explain what you can read here
 
-they may seem confusing as how can you perform operations on these objects, but they can be boiled down to the basic structure you're already familiar with
+It may seem confusing as how can you perform operations on these objects, especially the sfc and the sfg. What is underneath these prints? I will now show you that these representations can all be boiled down to the basic structure you're already familiar with
 :::
 
 ## Look into an sf object - POINTS (2)
@@ -272,15 +303,15 @@ pnt_sfg # simple feature geometry (sfg) - POINTS
 
 ```{r echo = TRUE}
 typeof(pnt_sfg) 
-unclass(pnt_sfg)
 attributes(pnt_sfg)
+unclass(pnt_sfg)
 ```
 
-The `POINT (152.8655 -31.4336)` format is called well-known text, which is a human-readable encoding used by sf
+The `POINT (152.8655 -31.4336)` format is called well-known text, which is a human-readable encoding used by `sf`
 
 ## Look into an sf object - POINTS (3)
 
-The POINT sfc is a list of sfg with special attributes 
+The sfc is a list of sfg with special attributes 
 
 ```{r echo = TRUE, results='hide'}
 pnt_sfc # simple feature column (sfc)
@@ -309,7 +340,7 @@ unclass(pnt_sfc)[1:2]
     [[2]]
     POINT (150.9291 -34.3691)
 
-## Other geoms - LINESTRING
+## Other geoms (1/3) - LINESTRING
 
 The linestring sfg is a matrix of paired doubles
 
@@ -328,7 +359,7 @@ typeof(ls_sfg)
 unclass(ls_sfg)
 ```
 
-## Other geoms - POLYGONS
+## Other geoms (2/3) - POLYGONS
 
 POLYGON sfg is a list where each element is a  matrix of paired vectors
 
@@ -347,7 +378,7 @@ typeof(pol_sfg)
 unclass(pol_sfg)
 ```
 
-## Other geoms - MULTIPOLYGONS
+## And lastly ...  MULTIPOLYGONS!
 
 MULTIPOLYGON sfg is a nested list where each list element can contain multiple matrices of paired vectors
 
@@ -359,7 +390,7 @@ mpol_sfc <- rmapshaper::ms_simplify(oz_simp[2,]$geometry, keep = 0.4)
 (mpol_sfg <- mpol_sfc[[1]])
 ```
 
-    MULTIPOLYGON (((146.5662 -38.74262, 146.6066 -38.75672, 146.5454 -38.79089, 146.494 -38.77426, 146.4648 -38.73993, 146.5061 -38.72507, 146.5662 -38.74262)), ((145.2475 -38.50478, 145.2217 -38.52812, 145.1439 -38.50573, 145.1668 -38.46616, 145.2145 -38.44883, 145.277 -38.45114, 145.308 -38.51863, 145.2475 -38.50478)), ...)
+    MULTIPOLYGON (((145.2859 -38.3962, 145.2903 -38.28367, 145.4109 -38.37078, 145.2859 -38.3962)), ((140.9657 -38.05599, 140.9739 -37.46209, 140.9693 -36.79305, 140.9631 -35.74853, 140.9656 -35.00826, 140.9617 -34.09582, ...)))
 
 ```{r echo = TRUE}
 typeof(mpol_sfg)
@@ -386,7 +417,7 @@ knitr::include_graphics(here::here("figures/geometrical-operations.png"))
 ```
 
 :::footer
-https://r-spatial.github.io/sf/reference/index.html
+[https://r-spatial.github.io/sf/reference/index.html](https://r-spatial.github.io/sf/reference/index.html)
 :::
 
 # Aggregate time series with `tsibble`
@@ -406,7 +437,6 @@ load(here::here("data/ts.rda"))
 ```
 
 ```{r}
-#| output-location: column-fragment
 #| echo: true
 ts %>% 
   ggplot(aes(x = date, y = tmax, group = id)) + 
