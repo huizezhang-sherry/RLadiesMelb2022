@@ -15,6 +15,7 @@ format:
       data-background-position: "top 0% right 0%"
       data-background-size: "10%, 10%"
     multiplex: true
+    chalkboard: true
 ---
 
 ```{r setup}
@@ -174,21 +175,25 @@ Now we will first talk about the spatial component before moving to the temporal
 
 ## Represent spatial data in R?
 
--   A pair of longitude/ latitude
-
+-   A pair of longitude/ latitude (`stations_dt`)
 ```{r}
 dt <- stations_sf %>% head(2)
 ```
 
 ```{r}
-dt %>% st_drop_geometry() %>% select(id, long, lat, elev, name, wmo_id)
+options(pillar.print_max = 2, pillar.print_min = 2)
+stations_sf %>% st_drop_geometry() %>% select(id, long, lat, elev, name, wmo_id)
 ```
 
--   Simple features with `sf`
+-   Simple features with `sf` (`stations_sf`)
+```{r}
+stations_sf %>% select(-long, -lat)
+```
 
 ```{r}
-dt %>% select(-long, -lat)
+options(pillar.print_max = 10, pillar.print_min = 10)
 ```
+
 
 :::{.notes}
 There are two ways you can represent spatial data in R. 
@@ -200,7 +205,7 @@ Another way is to use the simple feature representation with the sf package.
 
 :::
 
-## Geometrical operations with `sf`
+## Geometrical operations with sf
 
 ```{r, out.width="200%"}
 knitr::include_graphics(here::here("figures/geometrical-operations.png"))
@@ -217,7 +222,7 @@ Here I have a few examples ..
 
 :::
 
-## Ploting an `sf` object 
+## Ploting an sf object 
 ::: columns
 ::: {.column width="43%"}
 ```{r echo = TRUE}
@@ -283,8 +288,6 @@ dt # simple feature (sf)
 For beginners, the sf header and the geometry representation could be difficult to work with 
 
 Here are three common prints you may see 
-
-The first one is the print of an sf object, lets call it `dt`, ...
 
 explain what you can read here
 
@@ -408,7 +411,7 @@ unclass(mpol_sfg)
 
 <!-- an animation "|>" to next slide? -->
 
-## Geometrical operations with `sf` again
+## Geometrical operations with sf again
 
 <!-- Make a draw of various geometrical operations st_intersection() vs. st_intersects() st_combine() vs. st_union() -->
 
@@ -420,7 +423,7 @@ knitr::include_graphics(here::here("figures/geometrical-operations.png"))
 [https://r-spatial.github.io/sf/reference/index.html](https://r-spatial.github.io/sf/reference/index.html)
 :::
 
-# Aggregate time series with `tsibble`
+# Aggregate time series with tsibble
 
 ## Time series of weather station data
 
@@ -444,11 +447,49 @@ ts %>%
   theme_bw()
 ```
 
-<!-- Here it is daily data in 2020 from the stations we seen before. These weather stations measures precipitation, maximum and minimum temperature. -->
+:::{.notes}
+For the 30 stations I have shown you before, we also have daily information on precipitation, maximum and minimum temperature.
 
-<!-- Scripted from the BOM website -->
+Here I plot the maximum temperature of each station in 2020 and because it is daily data, these lines are quite wiggly.
+:::
 
-<!-- In a tsibble format -->
+
+## How's the data quality from BOM? {.smaller}
+
+First cast the data into a tsibble, before using `tsibble::count_gaps()` for data quality check
+
+::: columns
+::: {.column width="45%"}
+```{r echo = TRUE}
+ts
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="50%"}
+```{r echo = TRUE}
+library(tsibble)
+(ts_tsibble <- ts %>% 
+   as_tsibble(key = id, index = date))
+```
+
+:::
+:::
+
+:::{.notes}
+The data are downloaded from the Bureau of Meteorology and are structued in a long table 
+
+[introduce data]
+
+We would like to know about the data quatlity before proceed to any analysis and the tsibble package has a function `count_gaps()` for that.
+
+The `count_gaps()` function requires the data to be a tsibble object, so we first need to create a tsibble from our data.
+
+[explain creation]
+
+:::
 
 ## How's the data quality from BOM? 
 
@@ -457,45 +498,60 @@ options(pillar.print_max = 5, pillar.print_min = 5)
 ```
 
 ```{r echo = TRUE}
-ts_tsibble <- ts %>% tsibble::as_tsibble(key = id, index = date)
 (missings <- ts_tsibble %>% tsibble::count_gaps())
 ```
 
 ```{r echo = TRUE, eval = FALSE}
-missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
+missings <- missings %>% group_by(id) %>% mutate(ttl_n = sum(.n))
 missings %>% 
   ggplot() + 
-  geom_errorbar(aes(xmin = .from, xmax = .to, y = fct_reorder(id, .n)), 
+  geom_errorbar(aes(xmin = .from, xmax = .to, y = fct_reorder(id, ttl_n)), 
                 width = 0.2) + 
   theme_bw() + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") + 
   ylab("Station ID")
 ```
 
+:::{.notes}
+
+Then we can pipe the created tsibble into `count_gaps` and the output of it is a separate table summary 
+
+Here the first chunk of missing is for station 3057, from 02-17 to 02-18, for two days
+
+We can plot these missing gaps with geom errorbar. 
+
+In this code, I order the stations from the one has the most total missing to the least
+:::
+
+
+## How's the data quality from BOM?
+
 ```{r}
-options(pillar.print_max = 10, pillar.print_min = 10)
-```
-
-
-## How's the data quality from BOM (2)?
-
-```{r}
-missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
+missings <- missings %>% group_by(id) %>% mutate(ttl_n = sum(.n))
 missings %>%
   ggplot() +
   geom_errorbar(
     aes(xmin = .from, xmax = .to,
-        y = fct_reorder(id, .n)),
+        y = fct_reorder(id, ttl_n)),
     width = 0.2) +
   theme_bw() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   ylab("Station ID")
 ```
 
-## Inexplicit NAs to explicit NAs
+:::{.notes}
+Despite some small missingness for a day or two here and there, overall, these stations don't have a long period of missing.
+
+The only few that we may need to be cautious are ...
+
+Bear in mind that not all of the stations are automatic, someone needs to go to the station everyday 9 am to write down these numbers, so this amount of missingness is acceptable to me
+
+:::
+
+## Make the inexplicit NAs explicit {.smaller}
 
 ::: columns
-::: {.column width="45%"}
+::: {.column width="50%"}
 ```{r echo = TRUE}
 single <- ts_tsibble %>% 
   filter(id == "ASN00003057")
@@ -505,16 +561,18 @@ single_filled <- single %>%
 
 ```{r echo = TRUE}
 single %>% 
-  filter(date == "2020-02-17") %>% 
-  pull(tmax)
+  filter(date >= "2020-02-15") 
 
 single_filled %>% 
-  filter(date == "2020-02-17") %>% 
-  pull(tmax)
+  filter(date >= "2020-02-15")
 ```
+```{r}
+options(pillar.print_max = 10, pillar.print_min = 10)
+```
+
 :::
 
-::: {.column width="55%"}
+::: {.column width="50%"}
 ```{r}
 knitr::include_graphics(here::here("figures/explicit-na.png"))
 ```
@@ -522,20 +580,22 @@ knitr::include_graphics(here::here("figures/explicit-na.png"))
 :::
 :::
 
-## Summarising daily data
+:::{.notes}
+Sometimes, the missingness is not explicitly stated
 
-```{r}
-#| echo: true
-ts %>% 
-  group_by(month = lubridate::month(date), id) %>% 
-  summarise(tmax = mean(tmax, na.rm = TRUE)) %>% 
-  ggplot(aes(x = month, y = tmax, group = id)) + 
-  geom_line() + 
-  scale_x_continuous(breaks = seq(1, 12, 1)) + 
-  theme_bw()
-```
+We can inspect to see there is a jump from teh 16th to the 19th but the data do not speak for itself.
 
-# Space and time at the same time 
+These inexplicit NAs can bring in some unexpected error in your calculation that you're not even aware of. For example, 
+
+Without explicitly register the two missing dates, we will calculating using the four rows directly above the 19th of Feb and here it will be from 13th to 16th.
+
+while if the missingness is properly registered, we will be using the correct dates on the calculation. 
+
+The `fill_gaps()` functions from the tsibble package can populate the time into a complete grid and register the missing cells with NAs
+
+:::
+
+# Space and time at the same time with cubble
 
 ## Goal of today: glyph map
 
@@ -569,7 +629,7 @@ knitr::include_graphics(here::here("figures/cubble-operations.png"))
 ```
 
 :::footer
-https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html
+[https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html](https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html)
 :::
 
 ## Cast your data into a cubble 
