@@ -571,7 +571,7 @@ single_filled %>%
   filter(date >= "2020-02-15")
 ```
 ```{r}
-options(pillar.print_max = 10, pillar.print_min = 10)
+options(pillar.print_max = 7, pillar.print_min = 7)
 ```
 
 :::
