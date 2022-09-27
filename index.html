@@ -420,6 +420,9 @@
 </div>
 </div>
 </div>
+<div class="footer">
+<p><a href="https://huizezhangsh.netlify.app/">https://huizezhangsh.netlify.app/</a></p>
+</div>
 </section>
 <section id="roadmap" class="slide level2">
 <h2>Roadmap</h2>
@@ -1316,13 +1319,46 @@ POINT (150.9291 -34.3691)</code></pre>
 <section id="goal-of-today-glyph-map" class="slide level2">
 <h2>Goal of today: glyph map</h2>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-44-1.png" width="960" class="r-stretch quarto-figure-center"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-44-1.png" width="960" class="r-stretch quarto-figure-center"><aside class="notes">
+<p>One of today’s goals is for everyone to make a glyph map similar to this by the end of the session.</p>
+<p>We need a data structure to manpulate the data in space and in time, the data manipulation part.</p>
+<p>We also need a way to draw the small multiples on the map, the visualisation part.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="cubble---a-spatio-temporal-vector-data-structure" class="slide level2">
 <h2>Cubble - a spatio-temporal vector data structure</h2>
 
 <img data-src="figures/cubble-operations.png" width="960" class="r-stretch quarto-figure-center"><div class="footer">
 <p><a href="https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html">https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html</a></p>
 </div>
+<aside class="notes">
+<p>For the wrangling part, I will use the cubble package</p>
+<p>A cubble has two forms, a nested form where all the temporal data is nested in a list column, just as how the geometry is a list column in the sf package.</p>
+<p>This form can be used for calculation on the space or make per station summary from the time series</p>
+<p>Another form is called the long form, which will elaborate the time series data in the long form and temporaily hide the spatial data.</p>
+<p>With the long form, you can make some temporal summary of the data.</p>
+<p>Here the illustration shows you how to turn a nested cubble into the long form with <code>face_temporal()</code> and backward with <code>face_spatial()</code>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="cast-your-data-into-a-cubble" class="slide level2">
 <h2>Cast your data into a cubble</h2>
@@ -1350,6 +1386,23 @@ POINT (150.9291 -34.3691)</code></pre>
 # … with 20 more rows</code></pre>
 </div>
 </div>
+<aside class="notes">
+<p>There are different ways you can create a cubble.</p>
+<p>If you have the spatial and temporal data in two separate tables, you can supply them as a list.</p>
+<p>Then you need to specify some parameters. The key and index are the same as how you would construct a tsibble</p>
+<p>And cubble requires an additional <code>coords</code> parameter for coordinates.</p>
+<p>This is how the created cubble looks like</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="subset-on-space" class="slide level2">
 <h2>Subset on space</h2>
@@ -1412,11 +1465,25 @@ POINT (150.9291 -34.3691)</code></pre>
 # … with 230 more rows</code></pre>
 </div>
 </div>
+<aside class="notes">
+<p>Now we have longitude and latitude in the nested form and monthly summarised tmax in the long form, the last thing we need to do is to move them into the same table before making the glyph map.</p>
+<p>Here you need the verb <code>unfold</code></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="glyph-map-transformation" class="slide level2">
 <h2>Glyph map transformation</h2>
 
-<img data-src="figures/glyph-steps.png" width="1546" class="r-stretch quarto-figure-center"><div class="cell" data-layout-align="center">
+<img data-src="figures/glyph-steps.png" width="1354" class="r-stretch quarto-figure-center"><div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a>DATA <span class="sc">%&gt;%</span> </span>
 <span id="cb67-2"><a href="#cb67-2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
 <span id="cb67-3"><a href="#cb67-3"></a>  <span class="fu">geom_glyph</span>(</span>
@@ -1424,6 +1491,27 @@ POINT (150.9291 -34.3691)</code></pre>
 <span id="cb67-5"><a href="#cb67-5"></a>        <span class="at">y_major =</span> Y_MAJOR, <span class="at">y_minor =</span> Y_MINOR)) <span class="sc">+</span> </span>
 <span id="cb67-6"><a href="#cb67-6"></a>  ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="footer">
+<p>https://huizezhang-sherry.github.io/cubble/articles/glyph.html</p>
+</div>
+<aside class="notes">
+<p>The glyphmap is essentially a transformation of temporal variable into space.</p>
+<p>Here (1) shows a single station with its long and lat coordinate and (2) is its associated time series. We can use linear algebra to transform the temporal axes into the spatial scale as in (3) and once we have the time series in the transformed axes, they can be placed onto the map as in (4)</p>
+<p>To make a glyph map, you can use the <code>geom_glyph</code> function from cubble.</p>
+<p>It requires a pair of major and a pair of minor variable as aesthetics</p>
+<p>The major variable are the spatial coordinates, long and lat here and hte minor variable are the temporal coordinates, date and tmax here.</p>
+<p>Here (1) and (2) are</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="making-your-first-glyph-map" class="slide level2">
 <h2>Making your first glyph map</h2>
@@ -1434,29 +1522,24 @@ POINT (150.9291 -34.3691)</code></pre>
 <span id="cb68-2"><a href="#cb68-2"></a>  <span class="fu">list</span>(<span class="at">spatial =</span> stations_sf, <span class="at">temporal =</span> ts),</span>
 <span id="cb68-3"><a href="#cb68-3"></a>  <span class="at">key =</span> id, <span class="at">index =</span> date, <span class="at">coords =</span> <span class="fu">c</span>(long, lat)</span>
 <span id="cb68-4"><a href="#cb68-4"></a>)</span>
-<span id="cb68-5"><a href="#cb68-5"></a></span>
-<span id="cb68-6"><a href="#cb68-6"></a><span class="fu">set.seed</span>(<span class="dv">0927</span>)</span>
-<span id="cb68-7"><a href="#cb68-7"></a>cb_glyph <span class="ot">&lt;-</span> cb <span class="sc">%&gt;%</span> </span>
-<span id="cb68-8"><a href="#cb68-8"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb68-9"><a href="#cb68-9"></a>  <span class="fu">face_temporal</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb68-10"><a href="#cb68-10"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date)) <span class="sc">%&gt;%</span> </span>
-<span id="cb68-11"><a href="#cb68-11"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb68-12"><a href="#cb68-12"></a>  <span class="fu">unfold</span>(long, lat)</span>
-<span id="cb68-13"><a href="#cb68-13"></a></span>
-<span id="cb68-14"><a href="#cb68-14"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb68-15"><a href="#cb68-15"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> oz_simp, <span class="at">fill =</span> <span class="st">"grey95"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb68-16"><a href="#cb68-16"></a>  <span class="fu">geom_glyph</span>(</span>
-<span id="cb68-17"><a href="#cb68-17"></a>    <span class="at">data =</span> cb_glyph,</span>
-<span id="cb68-18"><a href="#cb68-18"></a>    <span class="fu">aes</span>(<span class="at">x_major =</span> long, <span class="at">x_minor =</span> month, <span class="at">y_major =</span> lat, <span class="at">y_minor =</span> tmax),</span>
-<span id="cb68-19"><a href="#cb68-19"></a>    <span class="at">width =</span> <span class="dv">2</span>, <span class="at">height =</span> <span class="fl">0.7</span>) <span class="sc">+</span> </span>
-<span id="cb68-20"><a href="#cb68-20"></a>  ggthemes<span class="sc">::</span><span class="fu">theme_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb68-5"><a href="#cb68-5"></a><span class="fu">set.seed</span>(<span class="dv">0927</span>)</span>
+<span id="cb68-6"><a href="#cb68-6"></a>cb_glyph <span class="ot">&lt;-</span> cb <span class="sc">%&gt;%</span> </span>
+<span id="cb68-7"><a href="#cb68-7"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-8"><a href="#cb68-8"></a>  <span class="fu">face_temporal</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb68-9"><a href="#cb68-9"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date)) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-10"><a href="#cb68-10"></a>  <span class="fu">summarise</span>(<span class="at">tmax =</span> <span class="fu">mean</span>(tmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-11"><a href="#cb68-11"></a>  <span class="fu">unfold</span>(long, lat)</span>
+<span id="cb68-12"><a href="#cb68-12"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb68-13"><a href="#cb68-13"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> oz_simp, <span class="at">fill =</span> <span class="st">"grey95"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb68-14"><a href="#cb68-14"></a>  <span class="fu">geom_glyph</span>(</span>
+<span id="cb68-15"><a href="#cb68-15"></a>    <span class="at">data =</span> cb_glyph,</span>
+<span id="cb68-16"><a href="#cb68-16"></a>    <span class="fu">aes</span>(<span class="at">x_major =</span> long, <span class="at">x_minor =</span> month, <span class="at">y_major =</span> lat, <span class="at">y_minor =</span> tmax),</span>
+<span id="cb68-17"><a href="#cb68-17"></a>    <span class="at">width =</span> <span class="dv">2</span>, <span class="at">height =</span> <span class="fl">0.7</span>) <span class="sc">+</span> </span>
+<span id="cb68-18"><a href="#cb68-18"></a>  ggthemes<span class="sc">::</span><span class="fu">theme_map</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-53-1.png" width="960" class="r-stretch quarto-figure-center"><div class="footer">
-<p>https://huizezhang-sherry.github.io/cubble/articles/glyph.html</p>
-</div>
-</section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-53-1.png" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="your-time" class="slide level2">
 <h2>Your Time</h2>
 <ol type="1">
@@ -1481,6 +1564,9 @@ POINT (150.9291 -34.3691)</code></pre>
 <li><p>The slides are made with <a href="https://quarto.org/">Quarto</a></p></li>
 <li><p>All the materials used to prepare the slides are available at <a href="sherryzhang-RLadiesMelb2022.netlify.app">sherryzhang-RLadiesMelb2022.netlify.app</a></p></li>
 </ul>
+<div class="cell" data-layout-align="center">
+
+</div>
 <div class="footer footer-default">
 
 </div>

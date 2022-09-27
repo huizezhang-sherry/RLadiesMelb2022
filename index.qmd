@@ -51,6 +51,10 @@ knitr::include_graphics(here::here("figures/headshot.jpg"))
 :::
 :::
 
+:::footer
+[https://huizezhangsh.netlify.app/](https://huizezhangsh.netlify.app/)
+:::
+
 ## Roadmap
 
 ::: columns
@@ -622,6 +626,16 @@ ggplot() +
   ggthemes::theme_map() 
 ```
 
+:::{.notes}
+One of today's goals is for everyone to make a glyph map similar to this by the end of the session. 
+
+We need a data structure to manpulate the data in space and in time, the data manipulation part. 
+
+We also need a way to draw the small multiples on the map, the visualisation part.
+
+:::
+
+
 ## Cubble - a spatio-temporal vector data structure 
 
 ```{r}
@@ -632,6 +646,23 @@ knitr::include_graphics(here::here("figures/cubble-operations.png"))
 [https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html](https://huizezhang-sherry.github.io/cubble/articles/cubble-design.html)
 :::
 
+:::{.notes}
+For the wrangling part, I will use the cubble package 
+
+A cubble has two forms, a nested form where all the temporal data is nested in a list column, just as how the geometry is a list column in the sf package.
+
+This form can be used for calculation on the space or make per station summary from the time series
+
+Another form is called the long form, which will elaborate the time series data in the long form and temporaily hide the spatial data. 
+
+With the long form, you can make some temporal summary of the data.
+
+Here the illustration shows you how to turn a nested cubble into the long form with `face_temporal()` and backward with `face_spatial()`.
+
+
+:::
+
+
 ## Cast your data into a cubble 
 
 ```{r echo = TRUE}
@@ -640,6 +671,19 @@ knitr::include_graphics(here::here("figures/cubble-operations.png"))
   key = id, index = date, coords = c(long, lat)
 ))
 ```
+
+:::{.notes}
+There are different ways you can create a cubble. 
+
+If you have the spatial and temporal data in two separate tables, you can supply them as a list. 
+
+Then you need to specify some parameters. The key and index are the same as how you would construct a tsibble 
+
+And cubble requires an additional `coords` parameter for coordinates.
+
+This is how the created cubble looks like
+:::
+
 
 ## Subset on space 
 
@@ -673,6 +717,13 @@ ggplot() +
 (cb_glyph <- cb_tm %>% unfold(long, lat))
 ```
 
+:::{.notes}
+Now we have longitude and latitude in the nested form and monthly summarised tmax in the long form, the last thing we need to do is to move them into the same table before making the glyph map.
+
+Here you need the verb `unfold`
+:::
+
+
 ## Glyph map transformation 
 
 ```{r}
@@ -688,6 +739,26 @@ DATA %>%
   ...
 ```
 
+:::footer
+https://huizezhang-sherry.github.io/cubble/articles/glyph.html
+:::
+
+
+:::{.notes}
+The glyphmap is essentially a transformation of temporal variable into space.
+
+Here (1) shows a single station with its long and lat coordinate and (2) is its associated time series. We can use linear algebra to transform the temporal axes into the spatial scale as in (3) and once we have the time series in the transformed axes, they can be placed onto the map as in (4)
+ 
+To make a glyph map, you can use the `geom_glyph` function from cubble. 
+
+It requires a pair of major and a pair of minor variable as aesthetics
+
+The major variable are the spatial coordinates, long and lat here and hte minor variable are the temporal coordinates, date and tmax here.
+
+Here (1) and (2) are 
+:::
+
+
 ## Making your first glyph map 
 
 ```{r}
@@ -697,7 +768,6 @@ cb <- as_cubble(
   list(spatial = stations_sf, temporal = ts),
   key = id, index = date, coords = c(long, lat)
 )
-
 set.seed(0927)
 cb_glyph <- cb %>% 
   slice_sample(n = 20) %>% 
@@ -705,7 +775,6 @@ cb_glyph <- cb %>%
   group_by(month = lubridate::month(date)) %>% 
   summarise(tmax = mean(tmax, na.rm = TRUE)) %>% 
   unfold(long, lat)
-
 ggplot() + 
   geom_sf(data = oz_simp, fill = "grey95", color = "white") +
   geom_glyph(
@@ -714,10 +783,6 @@ ggplot() +
     width = 2, height = 0.7) + 
   ggthemes::theme_map()
 ```
-
-:::footer
-https://huizezhang-sherry.github.io/cubble/articles/glyph.html
-:::
 
 ## Your Time 
 
@@ -742,3 +807,59 @@ https://huizezhang-sherry.github.io/cubble/articles/glyph.html
   
   - All the materials used to prepare the slides are available at [sherryzhang-RLadiesMelb2022.netlify.app](sherryzhang-RLadiesMelb2022.netlify.app)
   
+```{r eval = FALSE}
+# script for diagram 
+library(tidyverse)
+library(patchwork)
+nsw <- ozmaps::abs_ste %>% filter(NAME %in% c("New South Wales")) %>% rmapshaper::ms_simplify()
+
+single <- climate_aus %>% filter(id == "ASN00076031")
+glyph_dt <- single %>% face_temporal() %>% unfold(long, lat) %>% mutate(tmax = ifelse(is.na(tmax), lead(tmax, 2), tmax))
+p1 <- ggplot() + 
+  geom_sf(data = nsw,fill = "transparent", linetype = "dotted")+ 
+  geom_point(data = single, aes(x = long, y = lat)) + 
+  theme_bw() + 
+  coord_sf(xlim = c(141, 143), ylim = c(-35, -33.5)) + 
+  scale_x_continuous(breaks = seq(140, 143, 1)) + 
+  scale_y_continuous(breaks = seq(-35, -33, 1)) + 
+  ggtitle("(1)")
+
+p2 <- single %>% 
+  face_temporal() %>% 
+  ggplot(aes(x = date, y = tmax)) + 
+  geom_line(alpha = 0.8) + 
+  theme_bw() + 
+  theme() + 
+  ggtitle("(2)")
+
+glyph <- glyph_dt %>% 
+  ggplot(aes(x_major = long, x_minor = as.numeric(date),
+             y_major = lat, y_minor = tmax)) + 
+  geom_glyph(width = 1, height = 0.3)
+
+p3 <- layer_data(glyph) %>% 
+  ggplot(aes(x = x, y = y)) + 
+  geom_line(alpha = 0.8) +
+  theme_bw() + 
+  theme(axis.line = element_line(color = "#840032"),
+        axis.text = element_text(color = "#840032", size = 10),
+  ) + 
+  ggtitle("(3)") + xlab("long") + ylab("lat")
+
+p4 <- glyph_dt %>% 
+  ggplot(aes(x_major = long, x_minor = as.numeric(date),
+             y_major = lat, y_minor = tmax)) + 
+  geom_sf(data = nsw, fill = "transparent", linetype = "dotted", inherit.aes = FALSE) + 
+  geom_glyph(width = 1, height = 0.3, alpha = 0.8) + 
+  theme_bw() + 
+  coord_sf(xlim = c(141, 143), ylim = c(-35, -33.5)) + 
+  scale_x_continuous(breaks = seq(140, 143, 1)) + 
+  scale_y_continuous(breaks = seq(-35, -33, 1)) + 
+  ggtitle("(4)") + xlab("long") + ylab("lat")
+
+g2 <- (p1 | p2) / (p4 | p3) + plot_layout(guides='collect') &
+  theme(legend.position='none')
+
+ggsave(g2, filename = here::here("figures/glyph-steps.png"), height = 4)
+```
+
