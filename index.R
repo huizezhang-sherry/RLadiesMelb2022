@@ -59,6 +59,8 @@ ts %>%
   geom_line(alpha = 0.6) + 
   theme_bw()
 
+ts_tsibble <- ts %>% as_tsibble(key = id, index = date)
+missings <- ts_tsibble %>% tsibble::count_gaps()
 missings <- missings %>% group_by(id) %>% mutate(.n = sum(.n))
 missings %>%
   ggplot() +
